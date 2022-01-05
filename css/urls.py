@@ -20,4 +20,5 @@ from cssurvey import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='home'),
+    path('css/', views.customersurvey, name='customersurvey'),
 ]

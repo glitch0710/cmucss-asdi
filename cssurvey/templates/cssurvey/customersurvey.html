@@ -2,8 +2,88 @@
 
 {% block content %}
 
-<h1>Online Customer Satisfaction Survey</h1>
-<p class="lead">Digital Transformation Office</p>
+<h1>Digital Transformation Office</h1>
+<p class="lead">Online Customer Satisfaction Survey</p>
 <hr class="my-5" />
+{% if error %}
+<div class="alert alert-danger alert-icon" role="alert">
+    <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+    </button>
+    <div class="alert-icon-aside">
+        <i data-feather="alert-triangle"></i>
+    </div>
+    <div class="alert-icon-content">
+        <h6 class="alert-heading">Error</h6>
+        {{ error }}
+    </div>
+</div>
+{% endif %}
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="form-group"><label for="fullname">Fullname <span class="badge badge-info">optional</span></label><input class="form-control form-control-solid" id="fullname" name="fullname" type="text" placeholder="Enter your fullname here (optional)"></div>
+            <div class="form-group">
+                <label for="customer_type">I am a</label>
+                <select class="form-control form-control-solid" id="customer_type" name="customer_type">
+                    <option>Student</option>
+                    <option>Parent</option>
+                    <option>Employee</option>
+                    <option>Alumni</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-group"><label for="person_transacted">Person transacted with <span class="badge badge-info">optional</span></label><input class="form-control form-control-solid" id="person_transacted" name="person_transacted" type="text" placeholder="Enter name here (optional)"></div>
+        </div>
+    </div>
+
+    <hr class="my-5" />
+    <div class="card shadow">
+        <div class="card-body">
+            <h4>Please select the button corresponding to your answer.</h4>
+            <div class="label-inline">
+                <label>1 <span class="badge badge-danger">Poor</span></label>&emsp;
+                <label>2 <span class="badge badge-orange">Fair</span></label>&emsp;
+                <label>3 <span class="badge badge-warning">Satisfactory</span></label>&emsp;
+                <label>4 <span class="badge badge-teal">Very Satisfactory</span></label>&emsp;
+                <label>5 <span class="badge badge-success">Outstanding</span></label>&emsp;
+            </div>
+            {% for question in questions %}
+                <br><br><br>
+                <h4 class="alert alert-success">{{ question.question }}</h4>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input class="custom-control-input" id="questionOne{{ question.id }}" type="radio" value="1" name="rate{{ question.id }}">
+                    <label class="custom-control-label" for="questionOne{{ question.id }}">1</label>
+                </div>
+                &emsp;&emsp;
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input class="custom-control-input" id="questionTwo{{ question.id }}" type="radio" value="2" name="rate{{ question.id }}">
+                    <label class="custom-control-label" for="questionTwo{{ question.id }}">2</label>
+                </div>
+                &emsp;&emsp;
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input class="custom-control-input" id="questionThree{{ question.id }}" type="radio" value="3" name="rate{{ question.id }}">
+                    <label class="custom-control-label" for="questionThree{{ question.id }}">3</label>
+                </div>
+                &emsp;&emsp;
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input class="custom-control-input" id="questionFour{{ question.id }}" type="radio" value="4" name="rate{{ question.id }}">
+                    <label class="custom-control-label" for="questionFour{{ question.id }}">4</label>
+                </div>
+                &emsp;&emsp;
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input class="custom-control-input" id="questionFive{{ question.id }}" type="radio" value="5" name="rate{{ question.id }}">
+                    <label class="custom-control-label" for="questionFive{{ question.id }}">5</label>
+                </div>
+
+            {% endfor %}
+            <br><br><br>
+            <div class="form-group"><label for="comment">Comments and Suggestions <span class="badge badge-info">optional</span></label><textarea class="form-control form-control-solid" id="comment" name="comment" rows="5" placeholder="Enter your comments and suggestions here"></textarea></div>
+            <br><br><br>
+            <button class="btn font-weight-500 btn-teal" type="submit">Submit<i class="ml-2" data-feather="arrow-right"></i></button>
+        </div>
+    </div>
+</form>
 
 {% endblock %}

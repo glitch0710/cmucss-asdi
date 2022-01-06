@@ -11,22 +11,32 @@
         <meta name="author" content="" />
         <title>Online Customer Satisfaction Survey</title>
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
-        <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon.png' %}" />
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}" />
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.24.1/feather.min.js" crossorigin="anonymous"></script>
+        <style>
+            .custom-radio .custom-control-input:checked~.custom-control-label::before,
+            .custom-radio .custom-control-input:checked~.custom-control-label::after {
+                background-color: green;  /* green */
+                /* this bg image SVG is just a white circle, you can replace it with any valid SVG code */
+                background-image: url(data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%23fff'/%3E%3C/svg%3E);
+                border-radius: 50%;
+            }
+        </style>
     </head>
     <body>
         <div id="layoutDefault">
             <div id="layoutDefault_content">
                 <main>
                     <!-- Navbar-->
-                    <nav class="navbar navbar-marketing navbar-expand-lg bg-gradient-primary-to-secondary navbar-dark fixed-top">
+<!--                    <nav class="navbar navbar-marketing navbar-expand-lg bg-gradient-primary-to-secondary navbar-dark fixed-top">-->
+                    <nav class="navbar navbar-marketing navbar-expand-lg bg-teal navbar-dark fixed-top">
                         <div class="container">
-                            <a class="navbar-brand text-white" href="index.html">Online Customer Satisfaction Survey</a><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+                            <a class="navbar-brand text-white" href="{% url 'home' %}">Online Customer Satisfaction Survey</a><button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i data-feather="menu"></i></button>
                             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                                 <ul class="navbar-nav ml-auto mr-lg-5">
                                     <li>
-                                        <a class="btn font-weight-500 ml-lg-4 btn-teal" href="https://shop.startbootstrap.com/sb-ui-kit-pro">Sign in<i class="ml-2" data-feather="arrow-right"></i></a>
+                                        <a class="btn font-weight-500 ml-lg-4 btn-warning" href="https://shop.startbootstrap.com/sb-ui-kit-pro">Sign in<i class="ml-2" data-feather="arrow-right"></i></a>
                                     </li>
                                 </ul>
                             </div>

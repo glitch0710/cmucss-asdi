@@ -22,4 +22,5 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('css/', views.customersurvey, name='customersurvey'),
     path('css/submitcss', views.submitcss, name='submitcss'),
+    path('cpanel/', views.controlpanel, name='controlpanel'),
 ]

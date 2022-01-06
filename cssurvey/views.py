@@ -36,3 +36,7 @@ def customersurvey(request):
 
 def submitcss(request):
     return render(request, 'cssurvey/submitcss.html')
+
+
+def controlpanel(request):
+    return render(request, 'cssurvey/controlpanel.html')

@@ -27,9 +27,12 @@ def customersurvey(request):
             newcss.rate4 = request.POST.get('rate4')
             newcss.rate5 = request.POST.get('rate5')
             newcss.save()
-            return redirect('home')
+            return redirect('submitcss')
         except ValueError:
             return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
                                                                     'form': CustomerFeedbackForm,
                                                                     'error': 'Bad data passed in. Please try again!'})
 
+
+def submitcss(request):
+    return render(request, 'cssurvey/submitcss.html')

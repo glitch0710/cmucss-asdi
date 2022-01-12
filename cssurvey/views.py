@@ -1,6 +1,23 @@
 from django.shortcuts import render, redirect
 from .models import Question
 from .forms import CustomerFeedbackForm
+from django.contrib.auth import login, authenticate
+
+
+def loginuser(request):
+    if request.method == 'GET':
+        return render(request, 'cssurvey/loginuser.html')
+    else:
+        user = authenticate(request,
+                            email=request.POST['email'],
+                            password=request.POST['password'],)
+        if user is None:
+            return render(request,
+                          'cssurvey/loginuser.html',
+                          {'error': 'Email and password do not match. Please try again!'})
+        else:
+            login(request, user)
+            return redirect('controlpanel')
 
 
 def index(request):
@@ -29,9 +46,11 @@ def customersurvey(request):
             newcss.save()
             return redirect('submitcss')
         except ValueError:
-            return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
-                                                                    'form': CustomerFeedbackForm,
-                                                                    'error': 'Bad data passed in. Please try again!'})
+            return render(
+                request,
+                'cssurvey/customersurvey.html',
+                {'questions': questions, 'form': CustomerFeedbackForm, 'error': 'Bad data passed in. Please try again!'}
+            )
 
 
 def submitcss(request):

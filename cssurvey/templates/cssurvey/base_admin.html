@@ -11,7 +11,7 @@
         <meta name="author" content="" />
         <title>OCSS Control Panel</title>
         <link href="{% static 'css1/styles.css' %}" rel="stylesheet" />
-        <link rel="icon" type="image/x-icon" href="{% static 'assets1/img/favicon.ico' %}" />
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}" />
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
     </head>
@@ -21,7 +21,7 @@
             <!-- * * Tip * * You can use text or an image for your navbar brand.-->
             <!-- * * * * * * When using an image, we recommend the SVG format.-->
             <!-- * * * * * * Dimensions: Maximum height: 32px, maximum width: 240px-->
-            <a class="navbar-brand" href="index.html">Online CSS</a>
+            <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a>
             <!-- Sidenav Toggle Button-->
             <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 mr-lg-2" id="sidebarToggle"><i data-feather="menu"></i></button>
             <!-- Navbar Search Input-->
@@ -372,7 +372,7 @@
                 <footer class="footer mt-auto footer-light">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-6 small">Copyright &copy; Your Website 2021</div>
+                            <div class="col-md-6 small">Copyright &copy; DTO CSS 2021</div>
                             <div class="col-md-6 text-md-right small">
                                 <a href="#!">Privacy Policy</a>
                                 &middot;

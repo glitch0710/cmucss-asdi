@@ -18,7 +18,13 @@ from django.urls import path
 from cssurvey import views
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
+
+    # Auth
+    path('login/', views.loginuser, name='loginuser'),
+
+    # CSS
     path('', views.index, name='home'),
     path('css/', views.customersurvey, name='customersurvey'),
     path('css/submitcss', views.submitcss, name='submitcss'),

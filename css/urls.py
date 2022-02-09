@@ -23,6 +23,7 @@ urlpatterns = [
 
     # Auth
     path('login/', views.loginuser, name='loginuser'),
+    path('logout/', views.logoutuser, name='logoutuser'),
 
     # CSS
     path('', views.index, name='home'),

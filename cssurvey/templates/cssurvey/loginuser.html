@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>CSS Panel Login</title>
+        <title>CSS Control Panel Login</title>
         <link href="{% static 'css1/styles.css' %}" rel="stylesheet" />
         <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}" />
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
@@ -31,22 +31,23 @@
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-5">
+                                <br>
+                                {% if error %}
+                                    <div class="alert alert-danger alert-icon" role="alert">
+                                        <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                        <div class="alert-icon-aside">
+                                            <i data-feather="alert-triangle"></i>
+                                        </div>
+                                        <div class="alert-icon-content">
+                                            <h6 class="alert-heading">Error</h6>
+                                            {{ error }}
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <!-- Basic login form-->
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
-                                    {% if error %}
-                                        <div class="alert alert-danger alert-icon" role="alert">
-                                            <button class="close" type="button" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                            <div class="alert-icon-aside">
-                                                <i data-feather="alert-triangle"></i>
-                                            </div>
-                                            <div class="alert-icon-content">
-                                                <h6 class="alert-heading">Error</h6>
-                                                {{ error }}
-                                            </div>
-                                        </div>
-                                    {% endif %}
                                     <div class="card-header justify-content-center"><h3 class="font-weight-light my-2">Login</h3></div>
                                     <div class="card-body">
                                         <!-- Login form-->
@@ -54,13 +55,13 @@
                                             {% csrf_token %}
                                             <!-- Form Group (email address)-->
                                             <div class="form-group">
-                                                <label class="small mb-1" for="email">Email</label>
-                                                <input class="form-control" id="email" name="email" type="email" placeholder="Enter email address" />
+                                                <label class="small mb-1" for="username">Username</label>
+                                                <input class="form-control form-control-sm" id="username" name="username" type="text" placeholder="Enter username" />
                                             </div>
                                             <!-- Form Group (password)-->
                                             <div class="form-group">
                                                 <label class="small mb-1" for="password">Password</label>
-                                                <input class="form-control" id="password" name="password" type="password" placeholder="Enter password" />
+                                                <input class="form-control form-control-sm" id="password" name="password" type="password" placeholder="Enter password" />
                                             </div>
                                             <!-- Form Group (remember password checkbox)-->
                                             <div class="form-group">

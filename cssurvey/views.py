@@ -1,23 +1,33 @@
 from django.shortcuts import render, redirect
 from .models import Question
 from .forms import CustomerFeedbackForm
-from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 
 
 def loginuser(request):
     if request.method == 'GET':
-        return render(request, 'cssurvey/loginuser.html')
+        return render(request, 'cssurvey/loginuser.html', {'form': AuthenticationForm()})
     else:
         user = authenticate(request,
-                            email=request.POST['email'],
+                            username=request.POST['username'],
                             password=request.POST['password'],)
         if user is None:
             return render(request,
                           'cssurvey/loginuser.html',
-                          {'error': 'Email and password do not match. Please try again!'})
+                          {'form': AuthenticationForm(),
+                           'error': 'Email and password do not match. Please try again!'})
         else:
             login(request, user)
             return redirect('controlpanel')
+
+
+@login_required
+def logoutuser(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('loginuser')
 
 
 def index(request):
@@ -57,5 +67,6 @@ def submitcss(request):
     return render(request, 'cssurvey/submitcss.html')
 
 
+@login_required
 def controlpanel(request):
     return render(request, 'cssurvey/controlpanel.html')

@@ -1,14 +1,20 @@
 from django.contrib import admin
-from .models import CustomerFeedback, Question
+from .models import TbCssrespondents, TbQuestions, TbCmuoffices, TbCmuofficials, TbCoverage, \
+    TbCssrespondentsDetails, TbEmployees
 
 
 class CustomerFeedbackAdmin(admin.ModelAdmin):
-    readonly_fields = ('created_date',)
+    readonly_fields = ('responddate',)
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    readonly_fields = ('created_date',)
+    readonly_fields = ('datecreated',)
 
 
-admin.site.register(CustomerFeedback, CustomerFeedbackAdmin)
-admin.site.register(Question, QuestionAdmin)
+admin.site.register(TbCssrespondents, CustomerFeedbackAdmin)
+admin.site.register(TbQuestions, QuestionAdmin)
+admin.site.register(TbCmuoffices)
+admin.site.register(TbCmuofficials)
+admin.site.register(TbCoverage)
+admin.site.register(TbCssrespondentsDetails)
+admin.site.register(TbEmployees)

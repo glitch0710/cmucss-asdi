@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import Question
-from .forms import CustomerFeedbackForm
+from .models import TbQuestions, TbCoverage, TbCmuoffices
+from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -35,32 +35,51 @@ def index(request):
 
 
 def customersurvey(request):
-    questions = Question.objects.all()
+    questions = TbQuestions.objects.all()
     if request.method == 'GET':
-        return render(request, 'cssurvey/customersurvey.html', {'questions': questions, 'form': CustomerFeedbackForm})
+        return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
+                                                                'form': TbCssrespondentsForm,
+                                                                'form1': TbCssrespondentsDetailsForm})
     else:
-        try:
-            form = CustomerFeedbackForm(request.POST)
+        # try:
+            form = TbCssrespondentsForm(request.POST)
             newcss = form.save(commit=False)
 
-            rates = [newcss.rate1, newcss.rate2, newcss.rate3, newcss.rate4, newcss.rate5, ]
-            for rate in rates:
-                if int(rate) > 5:
-                    raise ValueError
+            newcss.employee_id = 0
+            newcss.coverageid = TbCoverage.objects.get(coverageid=5)
+            newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=35)
 
-            newcss.rate1 = request.POST.get('rate1')
-            newcss.rate2 = request.POST.get('rate2')
-            newcss.rate3 = request.POST.get('rate3')
-            newcss.rate4 = request.POST.get('rate4')
-            newcss.rate5 = request.POST.get('rate5')
             newcss.save()
+
+            last_id = TbCssrespondents.objects.latest('respondentid')
+
+            newcssdetails = form.save(commit=False)
+
+            for question in questions:
+                newcssdetails.respondentid = last_id
+                newcssdetails.qid = question.QID
+                newcssdetails.rating = 'rate' + question.QID
+                newcssdetails.save()
+
+            # rates = [newcss.rate1, newcss.rate2, newcss.rate3, newcss.rate4, newcss.rate5, ]
+            #
+            # for rate in rates:
+            #     if int(rate) > 5:
+            #         raise ValueError
+            #
+            # for question in questions:
+            #     newcss1.qid = question.QID
+            #     newcss1.rating = request.POST.get('rate' + question.QID)
+            #
+            # newcss1.save()
+            # newcss.save()
             return redirect('submitcss')
-        except ValueError:
-            return render(
-                request,
-                'cssurvey/customersurvey.html',
-                {'questions': questions, 'form': CustomerFeedbackForm, 'error': 'Bad data passed in. Please try again!'}
-            )
+        # except ValueError:
+        #     return render(
+        #         request,
+        #         'cssurvey/customersurvey.html',
+        #         {'questions': questions, 'form': TbCssrespondentsForm, 'error': 'Bad data passed in. Please try again!'}
+        #     )
 
 
 def submitcss(request):

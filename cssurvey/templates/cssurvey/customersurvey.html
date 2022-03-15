@@ -23,10 +23,10 @@
     {% csrf_token %}
     <div class="card shadow">
         <div class="card-body">
-            <div class="form-group"><label for="fullname">Fullname <span class="badge badge-info">optional</span></label><input class="form-control form-control-solid" id="fullname" name="fullname" type="text" placeholder="Enter your fullname here (optional)"></div>
+            <div class="form-group"><label for="fullname">Fullname <span class="badge badge-info">optional</span></label><input class="form-control form-control-solid" id="respondentname" name="respondentname" type="text" placeholder="Enter your fullname here (optional)"></div>
             <div class="form-group">
-                <label for="customer_type">I am a</label>
-                <select class="form-control form-control-solid" id="customer_type" name="customer_type">
+                <label for="respondenttype">I am a</label>
+                <select class="form-control form-control-solid" id="respondenttype" name="respondenttype">
                     <option>Student</option>
                     <option>Parent</option>
                     <option>Employee</option>
@@ -51,34 +51,34 @@
             </div>
             {% for question in questions %}
                 <br><br><br>
-                <h4 class="alert alert-success">{{ question.question }}</h4>
+                <h4 class="alert alert-success">{{ question.survey_question }}</h4>
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input class="custom-control-input" id="questionOne{{ question.id }}" type="radio" value="1" name="rate{{ question.id }}">
-                    <label class="custom-control-label" for="questionOne{{ question.id }}">1</label>
+                    <input class="custom-control-input" id="questionOne{{ question.QID }}" type="radio" value="1" name="rate{{ question.QID }}">
+                    <label class="custom-control-label" for="questionOne{{ question.QID }}">1</label>
                 </div>
                 &emsp;&emsp;
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input class="custom-control-input" id="questionTwo{{ question.id }}" type="radio" value="2" name="rate{{ question.id }}">
-                    <label class="custom-control-label" for="questionTwo{{ question.id }}">2</label>
+                    <input class="custom-control-input" id="questionTwo{{ question.QID }}" type="radio" value="2" name="rate{{ question.QID }}">
+                    <label class="custom-control-label" for="questionTwo{{ question.QID }}">2</label>
                 </div>
                 &emsp;&emsp;
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input class="custom-control-input" id="questionThree{{ question.id }}" type="radio" value="3" name="rate{{ question.id }}">
-                    <label class="custom-control-label" for="questionThree{{ question.id }}">3</label>
+                    <input class="custom-control-input" id="questionThree{{ question.QID }}" type="radio" value="3" name="rate{{ question.QID }}">
+                    <label class="custom-control-label" for="questionThree{{ question.QID }}">3</label>
                 </div>
                 &emsp;&emsp;
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input class="custom-control-input" id="questionFour{{ question.id }}" type="radio" value="4" name="rate{{ question.id }}">
-                    <label class="custom-control-label" for="questionFour{{ question.id }}">4</label>
+                    <input class="custom-control-input" id="questionFour{{ question.QID }}" type="radio" value="4" name="rate{{ question.QID }}">
+                    <label class="custom-control-label" for="questionFour{{ question.QID }}">4</label>
                 </div>
                 &emsp;&emsp;
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input class="custom-control-input" id="questionFive{{ question.id }}" type="radio" value="5" name="rate{{ question.id }}">
-                    <label class="custom-control-label" for="questionFive{{ question.id }}">5</label>
+                    <input class="custom-control-input" id="questionFive{{ question.QID }}" type="radio" value="5" name="rate{{ question.QID }}">
+                    <label class="custom-control-label" for="questionFive{{ question.QID }}">5</label>
                 </div>
             {% endfor %}
             <br><br><br>
-            <div class="form-group"><label for="comment">Comments and Suggestions <span class="badge badge-info">optional</span></label><textarea class="form-control form-control-solid" id="comment" name="comment" rows="5" placeholder="Enter your comments and suggestions here"></textarea></div>
+            <div class="form-group"><label for="comments">Comments and Suggestions <span class="badge badge-info">optional</span></label><textarea class="form-control form-control-solid" id="comments" name="comments" rows="5" placeholder="Enter your comments and suggestions here"></textarea></div>
             <br><br><br>
             <button class="btn font-weight-500 btn-teal" type="submit">Submit<i class="ml-2" data-feather="arrow-right"></i></button>
         </div>

@@ -1,9 +1,22 @@
 from django.forms import ModelForm
-from .models import CustomerFeedback
+from .models import TbCssrespondents, TbCssrespondentsDetails, TbQuestions
 
 
-class CustomerFeedbackForm(ModelForm):
+class TbCssrespondentsForm(ModelForm):
     class Meta:
-        model = CustomerFeedback
-        fields = ['fullname','customer_type','person_transacted','rate1','rate2','rate3','rate4', 'rate5','comment',]
+        model = TbCssrespondents
+        fields = ['respondentname',
+                  'respondenttype',
+                  'employee_id',
+                  'coverageid',
+                  'respondedofficeid',
+                  'comments',]
+
+
+class TbCssrespondentsDetailsForm(ModelForm):
+    class Meta:
+        model = TbCssrespondentsDetails
+        fields = ['qid',
+                  'respondentid',
+                  'rating',]
 

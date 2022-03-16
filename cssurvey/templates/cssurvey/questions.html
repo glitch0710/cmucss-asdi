@@ -1,0 +1,72 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block content %}
+
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary mb-4">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="help-circle"></i></div>
+                            Survey Questions
+                        </h1>
+                        <div class="page-header-subtitle">Basic information and setup of survey questions</div>
+                    </div>
+                </div>
+                <form action="{% url 'questions' %}" method="POST">
+                    <div class="page-header-search mt-4">
+                        <div class="input-group input-group-joined">
+                            <input class="form-control"  name="searchQuestion" id="searchQuestion" type="text" placeholder="Search..." aria-label="Search" autofocus />
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i data-feather="search"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container">
+        <h4 class="mb-0 mt-5">Active Questions on Display</h4>
+        <hr class="mt-2 mb-4" />
+        <!-- Active Questions-->
+        {% for activeque in active %}
+            <a class="card card-icon lift lift-sm mb-4" href="#">
+                <div class="row no-gutters">
+                    <div class="col-auto card-icon-aside bg-teal"><i class="text-white-50" data-feather="check-circle"></i></div>
+                    <div class="col">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-teal mb-2">Question No. {{ activeque.qid }}</h5>
+                            <p class="card-text mb-1">{{ activeque.survey_question }}</p>
+                            <div class="small text-muted">Active</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+        <h4 class="mb-0 mt-5">Inactive Questions</h4>
+        <hr class="mt-2 mb-4" />
+        <div class="row">
+            {% for inactiveque in inactive %}
+                <div class="col-lg-4 mb-4">
+                    <!-- Inactive Questions-->
+                    <a class="card lift lift-sm h-100" href="#">
+                        <div class="card-body">
+                            <h5 class="card-title text-orange mb-2">
+                                <i class="mr-2" data-feather="x-circle"></i>
+                                Question No. {{ inactiveque.qid }}
+                            </h5>
+                            <p class="card-text mb-1">{{ inactiveque.survey_question }}</p>
+                        </div>
+                        <div class="card-footer"><div class="small text-muted">Inactive</div></div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+{% endblock %}

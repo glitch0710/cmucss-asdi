@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import TbQuestions, TbCoverage, TbCmuoffices
+from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails
 from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
@@ -35,51 +35,68 @@ def index(request):
 
 
 def customersurvey(request):
-    questions = TbQuestions.objects.all()
+    questions = TbQuestions.objects.filter(display_status=1)
+
     if request.method == 'GET':
+        if request.GET.get('office'):
+            # implement this when finished with link generation for css
+            officeno = request.GET.get('office')
+        else:
+            # default for now
+            officeno = 35
+
+        officename = TbCmuoffices.objects.get(officeid=officeno)
         return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
+                                                                'office': officename,
                                                                 'form': TbCssrespondentsForm,
                                                                 'form1': TbCssrespondentsDetailsForm})
     else:
-        # try:
+        try:
+            if request.GET.get('office'):
+                # implement this when finished with link generation for css
+                officeno = request.GET.get('office')
+            else:
+                # default for now
+                officeno = 35
+
+            if request.GET.get('employee'):
+                # implement this when finished with link generation for css
+                employee = request.GET.get('employee')
+            else:
+                # default for now
+                employee = 0
+
             form = TbCssrespondentsForm(request.POST)
             newcss = form.save(commit=False)
 
-            newcss.employee_id = 0
-            newcss.coverageid = TbCoverage.objects.get(coverageid=5)
-            newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=35)
-
+            newcss.employee_id = employee
+            newcss.coverageid = TbCoverage.objects.latest('coverageid')
+            newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=officeno)
             newcss.save()
 
-            last_id = TbCssrespondents.objects.latest('respondentid')
+            # get last id inserted
+            last_id = newcss.respondentid
 
-            newcssdetails = form.save(commit=False)
-
+            css_details = request.POST
             for question in questions:
-                newcssdetails.respondentid = last_id
-                newcssdetails.qid = question.QID
-                newcssdetails.rating = 'rate' + question.QID
-                newcssdetails.save()
+                rate = css_details.get('rate' + str(question.qid))
+                if int(rate) > 5:
+                    raise ValueError
+                elif int(rate) <= 0:
+                    raise ValueError
 
-            # rates = [newcss.rate1, newcss.rate2, newcss.rate3, newcss.rate4, newcss.rate5, ]
-            #
-            # for rate in rates:
-            #     if int(rate) > 5:
-            #         raise ValueError
-            #
-            # for question in questions:
-            #     newcss1.qid = question.QID
-            #     newcss1.rating = request.POST.get('rate' + question.QID)
-            #
-            # newcss1.save()
-            # newcss.save()
+                TbCssrespondentsDetails.objects.create(qid=TbQuestions.objects.get(qid=question.qid),
+                                                       respondentid=TbCssrespondents.objects.get(respondentid=last_id),
+                                                       rating=rate)
+
             return redirect('submitcss')
-        # except ValueError:
-        #     return render(
-        #         request,
-        #         'cssurvey/customersurvey.html',
-        #         {'questions': questions, 'form': TbCssrespondentsForm, 'error': 'Bad data passed in. Please try again!'}
-        #     )
+        except ValueError:
+            TbCssrespondents.objects.filter(respondentid=last_id).delete()
+            return render(
+                request,
+                'cssurvey/customersurvey.html',
+                {'questions': questions, 'form': TbCssrespondentsForm, 'error': 'Bad data passed in. Please try again!'}
+            )
 
 
 def submitcss(request):
@@ -89,3 +106,16 @@ def submitcss(request):
 @login_required
 def controlpanel(request):
     return render(request, 'cssurvey/controlpanel.html')
+
+
+@login_required
+def questions(request):
+    if request.method == 'GET':
+        active_questions = TbQuestions.objects.filter(display_status=1)
+        inactive_questions = TbQuestions.objects.filter(display_status=0)
+        return render(request, 'cssurvey/questions.html', {'active': active_questions,
+                                                           'inactive': inactive_questions})
+    else:
+        search_data = request.POST
+        return_question_data = TbQuestions.objects.filter(survey_question=search_data.get('searchQuestion'))
+        return render(request, 'cssurvey/questions.html', {'searchedQuestion': return_question_data})

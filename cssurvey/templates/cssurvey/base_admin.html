@@ -125,7 +125,7 @@
                           <!-- Sidenav Menu Heading (Menu)-->
                           <div class="sidenav-menu-heading">Menu</div>
 
-                          <a class="nav-link" href="#">
+                          <a class="nav-link" href="{% url 'controlpanel' %}">
                               <div class="nav-link-icon"><i data-feather="activity"></i></div>
                               Dashboard
                           </a>
@@ -135,11 +135,10 @@
                               Monitoring
                               <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                           </a>
-
                           <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
                               <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
                                   <a class="nav-link" href="dashboard-2.html">Offices</a>
-                                  <a class="nav-link" href="dashboard-3.html">Questions</a>
+                                  <a class="nav-link" href="{% url 'questions' %}">Questions</a>
                               </nav>
                           </div>
                           <!-- Sidenav Heading (Reports)-->

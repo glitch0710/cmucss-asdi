@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from cssurvey import views
 
@@ -31,4 +33,6 @@ urlpatterns = [
     path('css/submitcss', views.submitcss, name='submitcss'),
     path('cpanel/', views.controlpanel, name='controlpanel'),
     path('surveyquestions/', views.questions, name='questions'),
-]
+    path('surveyquestions/<int:question_pk>', views.viewquestion, name='viewquestion',)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

@@ -1,0 +1,66 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block content %}
+
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="layout"></i></div>
+                            Question No. {{ question.qid }}
+                        </h1>
+                        <div class="page-header-subtitle">View or update question details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container mt-n10">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="card card-header-actions mx-auto">
+                <div class="card-header">
+                    Update Question
+                    <div>
+                        <a class="btn btn-danger btn-icon mr-2" href="{% url 'questions' %}">
+                            <i data-feather="x"></i>
+                        </a>
+                        <button class="btn btn-teal btn-icon mr-2" name="editQuestion" id="editQuestion" type="submit">
+                            <i data-feather="check"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                        <div class="alert alert-danger alert-icon" role="alert">
+                            <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <div class="alert-icon-aside">
+                                <i data-feather="alert-triangle"></i>
+                            </div>
+                            <div class="alert-icon-content">
+                                <h6 class="alert-heading">Error</h6>
+                                {{ error }}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label for="survey_question">Survey Question</label>
+                        <textarea class="form-control" id="survey_question" name="survey_question" rows="8">{{ question.survey_question }}</textarea>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="display_status" class="form-check-input" id="display_status" {% if question.display_status %} checked {% endif %}>
+                        <label class="form-check-label" for="display_status">Active</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+{% endblock %}

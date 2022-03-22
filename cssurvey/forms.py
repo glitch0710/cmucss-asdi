@@ -20,3 +20,9 @@ class TbCssrespondentsDetailsForm(ModelForm):
                   'respondentid',
                   'rating',]
 
+
+class TbQuestionsForm(ModelForm):
+    class Meta:
+        model = TbQuestions
+        fields = ['survey_question', 'display_status']
+

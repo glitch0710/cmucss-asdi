@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails
-from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents
+from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -114,8 +114,30 @@ def questions(request):
         active_questions = TbQuestions.objects.filter(display_status=1)
         inactive_questions = TbQuestions.objects.filter(display_status=0)
         return render(request, 'cssurvey/questions.html', {'active': active_questions,
-                                                           'inactive': inactive_questions})
+                                                           'inactive': inactive_questions,
+                                                           'searched': '',})
+
     else:
         search_data = request.POST
-        return_question_data = TbQuestions.objects.filter(survey_question=search_data.get('searchQuestion'))
-        return render(request, 'cssurvey/questions.html', {'searchedQuestion': return_question_data})
+        return_question_data = TbQuestions.objects.filter(survey_question__icontains=search_data.get('searchQuestion'))
+
+        return render(request, 'cssurvey/questions.html', {'active': '',
+                                                           'inactive': '',
+                                                           'searched': return_question_data,})
+
+
+@login_required
+def viewquestion(request, question_pk):
+    question = get_object_or_404(TbQuestions, pk=question_pk)
+    if request.method == 'GET':
+        form = TbQuestionsForm(instance=question)
+        return render(request, 'cssurvey/viewquestion.html', {'question': question, 'form': form})
+    else:
+        try:
+            form = TbQuestionsForm(request.POST, instance=question)
+            form.save()
+            return redirect('questions')
+        except ValueError:
+            return render(request, 'cssurvey/viewquestion.html', {'question': question,
+                                                                  'form': form,
+                                                                  'error': 'Bad data passed in!'})

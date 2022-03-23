@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails
 from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 
@@ -141,3 +141,12 @@ def viewquestion(request, question_pk):
             return render(request, 'cssurvey/viewquestion.html', {'question': question,
                                                                   'form': form,
                                                                   'error': 'Bad data passed in!'})
+
+
+@login_required
+def user_accounts(request):
+    if request.method == 'GET':
+        return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm()})
+    else:
+        pass
+

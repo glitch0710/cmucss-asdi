@@ -152,7 +152,7 @@
                           <!-- Sidenav Heading (Reports)-->
                           <div class="sidenav-menu-heading">Users</div>
                           <!-- Sidenav Accordion (User Accounts)-->
-                          <a class="nav-link" href="#">
+                          <a class="nav-link" href="{% url 'user_accounts' %}">
                               <div class="nav-link-icon"><i data-feather="users"></i></div>
                               User Accounts
                           </a>
@@ -192,5 +192,8 @@
         <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="{% static 'assets1/demo/datatables-demo.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" crossorigin="anonymous"></script>
+        <script src="{% static 'assets1/demo/date-range-picker-demo.js' %}"></script>
     </body>
 </html>

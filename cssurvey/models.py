@@ -1,12 +1,7 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class TbCmuoffices(models.Model):
@@ -113,13 +108,29 @@ class TbQuestions(models.Model):
 
 class TbEmployees(models.Model):
     eid = models.AutoField(db_column='EID', primary_key=True)  # Field name made lowercase.
-    employee_name = models.CharField(max_length=255, blank=True, null=True)
-    office_id = models.IntegerField(blank=True, null=True)
+    office_id = models.ForeignKey('TbCmuoffices', models.DO_NOTHING, db_column='officeID')
     job_position = models.CharField(max_length=255, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    middlename = models.CharField(max_length=255, blank=True, null=True)
+    image = models.ImageField(upload_to='cssurvey/images/')
 
     def __str__(self):
-        return self.employee_name
+        return self.user
 
     class Meta:
         managed = False
         db_table = 'tb_employees'
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        TbEmployees.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+
+

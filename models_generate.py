@@ -77,34 +77,6 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
-class CssurveyCustomerfeedback(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    fullname = models.CharField(max_length=200)
-    customer_type = models.CharField(max_length=300)
-    person_transacted = models.CharField(max_length=200)
-    rate1 = models.IntegerField()
-    rate2 = models.IntegerField()
-    rate3 = models.IntegerField()
-    rate4 = models.IntegerField()
-    comment = models.TextField()
-    created_date = models.DateTimeField()
-    rate5 = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'cssurvey_customerfeedback'
-
-
-class CssurveyQuestion(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    question = models.TextField()
-    created_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'cssurvey_question'
-
-
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
@@ -214,9 +186,11 @@ class TbCssrespondentsDetails(models.Model):
 
 class TbEmployees(models.Model):
     eid = models.AutoField(db_column='EID', primary_key=True)  # Field name made lowercase.
-    employee_name = models.CharField(max_length=255, blank=True, null=True)
     office_id = models.IntegerField(blank=True, null=True)
     job_position = models.CharField(max_length=255, blank=True, null=True)
+    user = models.IntegerField(blank=True, null=True)
+    middlename = models.CharField(max_length=255, blank=True, null=True)
+    image = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -238,7 +212,7 @@ class TbQuestions(models.Model):
     qid = models.AutoField(db_column='QID', primary_key=True)  # Field name made lowercase.
     survey_question = models.CharField(max_length=255, blank=True, null=True)
     datecreated = models.DateTimeField(db_column='dateCreated', blank=True, null=True)  # Field name made lowercase.
-    display_status = models.TextField(blank=True, null=True)  # This field type is a guess.
+    display_status = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

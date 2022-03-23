@@ -33,6 +33,7 @@ urlpatterns = [
     path('css/submitcss', views.submitcss, name='submitcss'),
     path('cpanel/', views.controlpanel, name='controlpanel'),
     path('surveyquestions/', views.questions, name='questions'),
-    path('surveyquestions/<int:question_pk>', views.viewquestion, name='viewquestion',)
+    path('surveyquestions/<int:question_pk>', views.viewquestion, name='viewquestion',),
+    path('cpanel/users', views.user_accounts, name='user_accounts',),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

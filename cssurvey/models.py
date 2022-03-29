@@ -108,9 +108,9 @@ class TbQuestions(models.Model):
 
 class TbEmployees(models.Model):
     eid = models.AutoField(db_column='EID', primary_key=True)  # Field name made lowercase.
-    office_id = models.ForeignKey('TbCmuoffices', models.DO_NOTHING, db_column='officeID')
+    office_id = models.ForeignKey('TbCmuoffices', models.DO_NOTHING, db_column='office_id')
     job_position = models.CharField(max_length=255, blank=True, null=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, db_column='user')
     middlename = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='cssurvey/images/')
 
@@ -122,15 +122,15 @@ class TbEmployees(models.Model):
         db_table = 'tb_employees'
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        TbEmployees.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+# @receiver(post_save, sender=User)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         TbEmployees.objects.create(user=instance)
+#
+#
+# @receiver(post_save, sender=User)
+# def save_user_profile(sender, instance, **kwargs):
+#     instance.profile.save()
 
 
 

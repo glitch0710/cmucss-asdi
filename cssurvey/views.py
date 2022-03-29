@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails
-from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth import login, authenticate, logout
+from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails, TbEmployees
+from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm, TbEmployeesForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.contrib.auth import login, authenticate, logout, get_user_model
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 
 
 def loginuser(request):
@@ -146,7 +148,41 @@ def viewquestion(request, question_pk):
 @login_required
 def user_accounts(request):
     if request.method == 'GET':
-        return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm()})
-    else:
-        pass
+        user = get_user_model()
+        users = user.objects.all()
 
+        return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm(),
+                                                              'form1': UserChangeForm(),
+                                                              'users': users})
+    else:
+        # data = request.POST
+        if request.POST['password1'] == request.POST['password2']:
+            try:
+                new_user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
+                new_user.last_name = request.POST['last_name']
+                new_user.first_name = request.POST['first_name']
+                new_user.email = request.POST['email']
+                new_user.save()
+
+                TbEmployees.objects.create(office_id=TbCmuoffices.objects.get(officeid=35),
+                                           job_position=request.POST['job_position'],
+                                           user=User.objects.get(id=User.objects.latest('id').id))
+
+                return redirect('user_accounts')
+            except IntegrityError:
+                user = get_user_model()
+                users = user.objects.all()
+                return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm(),
+                                                                      'form1': UserChangeForm(),
+                                                                      'users': users,
+                                                                      'error': 'That username has already been taken.'
+                                                                               ' Please choose a new username'})
+
+        else:
+            user = get_user_model()
+            users = user.objects.all()
+
+            return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm(),
+                                                                  'form1': UserChangeForm(),
+                                                                  'users': users,
+                                                                  'error': 'Passwords did not match'})

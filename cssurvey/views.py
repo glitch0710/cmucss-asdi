@@ -137,12 +137,39 @@ def viewquestion(request, question_pk):
     else:
         try:
             form = TbQuestionsForm(request.POST, instance=question)
-            form.save()
-            return redirect('questions')
+            if form.is_valid():
+                form.save()
+                return redirect('questions')
+            else:
+                raise ValueError
         except ValueError:
             return render(request, 'cssurvey/viewquestion.html', {'question': question,
                                                                   'form': form,
                                                                   'error': 'Bad data passed in!'})
+
+
+@login_required
+def create_question(request):
+    if request.method == 'POST':
+        new_question = TbQuestionsForm(request.POST)
+        if new_question.is_valid():
+            new_question.save()
+            return redirect('questions')
+        else:
+            active_questions = TbQuestions.objects.filter(display_status=1)
+            inactive_questions = TbQuestions.objects.filter(display_status=0)
+            return render(request, 'cssurvey/questions.html', {'active': active_questions,
+                                                               'inactive': inactive_questions,
+                                                               'searched': '',
+                                                               'error': 'Bad data passed in. Please try again!'})
+
+
+@login_required
+def delete_question(request, question_pk):
+    if request.method == 'POST':
+        del_question = get_object_or_404(TbQuestions, pk=question_pk)
+        del_question.delete()
+        return redirect('questions')
 
 
 @login_required
@@ -155,7 +182,6 @@ def user_accounts(request):
                                                               'form1': UserChangeForm(),
                                                               'users': users})
     else:
-        # data = request.POST
         if request.POST['password1'] == request.POST['password2']:
             try:
                 new_user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])

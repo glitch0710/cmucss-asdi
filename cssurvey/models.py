@@ -95,7 +95,7 @@ class TbLogs(models.Model):
 class TbQuestions(models.Model):
     qid = models.AutoField(db_column='QID', primary_key=True)  # Field name made lowercase.
     survey_question = models.CharField(max_length=255, blank=True, null=True)
-    datecreated = models.DateTimeField(db_column='dateCreated', blank=True, null=True)  # Field name made lowercase.
+    datecreated = models.DateTimeField(db_column='dateCreated', auto_now_add=True)  # Field name made lowercase.
     display_status = models.BooleanField(default=False)  # This field type is a guess.
 
     def __str__(self):

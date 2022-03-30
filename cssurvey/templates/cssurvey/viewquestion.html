@@ -26,9 +26,12 @@
                 <div class="card-header">
                     Update Question
                     <div>
-                        <a class="btn btn-danger btn-icon mr-2" href="{% url 'questions' %}">
-                            <i data-feather="x"></i>
+                        <a class="btn btn-warning btn-icon mr-2" href="{% url 'questions' %}">
+                            <i data-feather="arrow-left"></i>
                         </a>
+                        <button class="btn btn-danger btn-icon mr-2" onclick="$('#delete').click()">
+                            <i data-feather="trash-2"></i>
+                        </button>
                         <button class="btn btn-teal btn-icon mr-2" name="editQuestion" id="editQuestion" type="submit">
                             <i data-feather="check"></i>
                         </button>
@@ -59,6 +62,10 @@
                     </div>
                 </div>
             </div>
+        </form>
+        <form action="{% url 'delete_question' question.qid %}" method="POST" style="display: none;">
+            {% csrf_token %}
+            <button id="delete" type="submit">Delete</button>
         </form>
     </div>
 </main>

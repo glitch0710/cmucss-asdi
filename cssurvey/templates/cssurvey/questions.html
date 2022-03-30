@@ -31,6 +31,20 @@
     </header>
     <!-- Main page content-->
     <div class="container">
+        {% if error %}
+            <div class="alert alert-danger alert-icon" role="alert">
+                <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="alert-icon-aside">
+                    <i data-feather="alert-triangle"></i>
+                </div>
+                <div class="alert-icon-content">
+                    <h6 class="alert-heading">Error</h6>
+                    {{ error }}
+                </div>
+            </div>
+        {% endif %}
         {% if active != '' %}
             <h4 class="mb-0 mt-5">Active Questions on Display</h4>
             <hr class="mt-2 mb-4" />
@@ -101,7 +115,43 @@
                 </div>
             </div>
         {% endif %}
+        <div class="text-center mt-5">
+            <h4 class="mb-3">Add New Survey Question</h4>
+            <div class="mb-3">
+                <button class="btn btn-primary mx-2 px-3" name="addQuestion" id="addQuestion" type="button" data-toggle="modal" data-target="#createQuestionModal">
+                    <i class="mr-2" style="width: 20px; height: 20px" data-feather="file-plus"></i>
+                    New Question
+                </button>
+            </div>
+        </div>
     </div>
+    <form action="{% url 'create_question' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="createQuestionModal" tabindex="-1" role="dialog" aria-labelledby="createQuestionModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Question</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="survey_question">Survey Question</label>
+                            <textarea class="form-control" id="survey_question" name="survey_question" rows="8"></textarea>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" name="display_status" class="form-check-input" id="display_status" />
+                            <label class="form-check-label" for="display_status">Active</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-teal" type="submit" name="add_question" id="add_question">Submit <i class="ml-2" data-feather="arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </main>
 
 {% endblock %}

@@ -151,11 +151,23 @@ def viewquestion(request, question_pk):
 @login_required
 def create_question(request):
     if request.method == 'POST':
-        new_question = TbQuestionsForm(request.POST)
-        if new_question.is_valid():
-            new_question.save()
-            return redirect('questions')
-        else:
+        try:
+            new_question = TbQuestionsForm(request.POST)
+            if new_question.is_valid():
+                print(request.POST['survey_question'])
+                if request.POST['survey_question'] is None or request.POST['survey_question'] == '':
+                    raise ValueError
+                else:
+                    new_question.save()
+                    return redirect('questions')
+            else:
+                active_questions = TbQuestions.objects.filter(display_status=1)
+                inactive_questions = TbQuestions.objects.filter(display_status=0)
+                return render(request, 'cssurvey/questions.html', {'active': active_questions,
+                                                                   'inactive': inactive_questions,
+                                                                   'searched': '',
+                                                                   'error': 'Bad data passed in. Please try again!'})
+        except ValueError:
             active_questions = TbQuestions.objects.filter(display_status=1)
             inactive_questions = TbQuestions.objects.filter(display_status=0)
             return render(request, 'cssurvey/questions.html', {'active': active_questions,
@@ -166,10 +178,13 @@ def create_question(request):
 
 @login_required
 def delete_question(request, question_pk):
+    del_question = get_object_or_404(TbQuestions, pk=question_pk)
     if request.method == 'POST':
-        del_question = get_object_or_404(TbQuestions, pk=question_pk)
-        del_question.delete()
-        return redirect('questions')
+        if del_question.display_status:
+            return redirect('viewquestion', question_pk=del_question.qid)
+        else:
+            del_question.delete()
+            return redirect('questions')
 
 
 @login_required
@@ -212,3 +227,16 @@ def user_accounts(request):
                                                                   'form1': UserChangeForm(),
                                                                   'users': users,
                                                                   'error': 'Passwords did not match'})
+
+
+@login_required
+def view_user(request, user_pk):
+    if request.method == 'GET':
+        user_details = get_object_or_404(User, pk=user_pk)
+        user_profile = get_object_or_404(TbEmployees, user=user_pk)
+        form_profile = TbEmployeesForm(instance=user_profile)
+        return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
+                                                          'profile': user_details,
+                                                          'profile_details': user_profile})
+    else:
+        pass

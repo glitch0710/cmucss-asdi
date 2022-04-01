@@ -32,10 +32,11 @@ urlpatterns = [
     path('css/', views.customersurvey, name='customersurvey'),
     path('css/submitcss', views.submitcss, name='submitcss'),
     path('cpanel/', views.controlpanel, name='controlpanel'),
-    path('surveyquestions/', views.questions, name='questions'),
-    path('surveyquestions/create', views.create_question, name='create_question'),
-    path('surveyquestions/<int:question_pk>', views.viewquestion, name='viewquestion',),
-    path('surveyquestions/<int:question_pk>/delete', views.delete_question, name='delete_question'),
-    path('cpanel/users', views.user_accounts, name='user_accounts',),
+    path('cpanel/surveyquestions/', views.questions, name='questions'),
+    path('cpanel/surveyquestions/create', views.create_question, name='create_question'),
+    path('cpanel/surveyquestions/<int:question_pk>', views.viewquestion, name='viewquestion'),
+    path('cpanel/surveyquestions/<int:question_pk>/delete', views.delete_question, name='delete_question'),
+    path('cpanel/users', views.user_accounts, name='user_accounts'),
+    path('cpanel/users/<int:user_pk>', views.view_user, name='view_user'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

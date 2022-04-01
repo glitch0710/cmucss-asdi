@@ -29,7 +29,7 @@
                         <a class="btn btn-warning btn-icon mr-2" href="{% url 'questions' %}">
                             <i data-feather="arrow-left"></i>
                         </a>
-                        <button class="btn btn-danger btn-icon mr-2" onclick="$('#delete').click()">
+                        <button class="btn btn-danger btn-icon mr-2" type="button" data-toggle="modal" data-target="#deleteConfirmationModal" {% if question.display_status %} disabled {% endif %}>
                             <i data-feather="trash-2"></i>
                         </button>
                         <button class="btn btn-teal btn-icon mr-2" name="editQuestion" id="editQuestion" type="submit">
@@ -63,6 +63,22 @@
                 </div>
             </div>
         </form>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteConfirmationModalTitle">Delete Question</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to delete this survey question?</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-teal" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-danger mr-2" type="button" onclick="$('#delete').click()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <form action="{% url 'delete_question' question.qid %}" method="POST" style="display: none;">
             {% csrf_token %}
             <button id="delete" type="submit">Delete</button>

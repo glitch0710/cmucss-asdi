@@ -1,5 +1,6 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput, EmailInput, Select
 from .models import TbCssrespondents, TbCssrespondentsDetails, TbQuestions, TbEmployees
+from django.contrib.auth.models import User
 
 
 class TbCssrespondentsForm(ModelForm):
@@ -31,4 +32,11 @@ class TbEmployeesForm(ModelForm):
     class Meta:
         model = TbEmployees
         fields = ['office_id', 'job_position', 'user', 'middlename', 'image']
+        widgets = {
+            'office_id': Select(attrs={
+                'class': "form-control",
+                'id': "id_office_id",
+                'name': "id_office_id",
+            })
+        }
 

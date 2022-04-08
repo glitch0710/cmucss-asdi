@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class TbCmuoffices(models.Model):
     officeid = models.AutoField(db_column='officeID', primary_key=True)  # Field name made lowercase.
-    officename = models.TextField(db_column='officeName', blank=True, null=True)  # Field name made lowercase.
+    officename = models.TextField(db_column='officeName', blank=False, null=False)  # Field name made lowercase.
     officecode = models.TextField(db_column='officeCode', blank=True, null=True)  # Field name made lowercase.
     scope = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=False)

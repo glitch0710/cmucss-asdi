@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails, TbEmployees
-from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm, TbEmployeesForm, UserChangeUpdateForm, UserProfileUpdateForm, TbCmuOfficesForm
+from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm, TbEmployeesForm, UserChangeUpdateForm, UserProfileUpdateForm, TbCmuOfficesForm, TbCmuOfficesAddForm
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.models import User
@@ -8,6 +8,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import HttpResponse
+
+
+def page_not_found_view(request, exception):
+    return render(request, 'cssurvey/error-404.html')
 
 
 def loginuser(request):
@@ -363,9 +367,25 @@ def reactivate_user(request, user_pk):
 def offices(request):
     if request.method == 'GET':
         all_offices = TbCmuoffices.objects.all()
-        return render(request, 'cssurvey/offices.html', {'offices': all_offices})
+        return render(request, 'cssurvey/offices.html', {'offices': all_offices,
+                                                         'form': TbCmuOfficesAddForm})
     else:
-        pass
+        try:
+            submit_form = TbCmuOfficesAddForm(request.POST)
+
+            if submit_form.is_valid():
+                submit_form.save()
+                return redirect('offices')
+            else:
+                all_offices = TbCmuoffices.objects.all()
+                return render(request, 'cssurvey/offices.html', {'offices': all_offices,
+                                                                 'form': TbCmuOfficesAddForm,
+                                                                 'error': 'Form did not validate. Please try again.'})
+        except ValueError:
+            all_offices = TbCmuoffices.objects.all()
+            return render(request, 'cssurvey/offices.html', {'offices': all_offices,
+                                                             'form': TbCmuOfficesAddForm,
+                                                             'error': 'Bad data passed in. Please try again.'})
 
 
 @login_required

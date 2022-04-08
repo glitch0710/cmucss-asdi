@@ -75,3 +75,21 @@ class TbCmuOfficesForm(ModelForm):
                 'type': "checkbox"
             }),
         }
+
+
+class TbCmuOfficesAddForm(ModelForm):
+    class Meta:
+        model = TbCmuoffices
+        fields = ['officename', 'officecode',]
+        widgets = {
+            'officename': Textarea(attrs={
+                'class': "form-control",
+                'id': "officename",
+                'name': "officename",
+            }),
+            'officecode': TextInput(attrs={
+                'class': "form-control",
+                'id': "officecode",
+                'name': "officecode",
+            }),
+        }

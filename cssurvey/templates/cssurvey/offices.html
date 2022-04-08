@@ -1,0 +1,90 @@
+{% extends "cssurvey/base_admin.html" %}
+
+{% block content %}
+
+{% load static %}
+<main>
+    <header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+        <div class="container">
+            <div class="page-header-content pt-4">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-auto mt-4">
+                        <h1 class="page-header-title">
+                            <div class="page-header-icon"><i data-feather="briefcase"></i></div>
+                            Offices
+                        </h1>
+                        <div class="page-header-subtitle">View or update office details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main page content-->
+    <div class="container mt-n10">
+        <div class="card mb-4 card-header-actions mx-auto">
+            <div class="card-header">
+                Offices Management
+                <div>
+                    <button class="btn btn-primary btn-icon mr-2" name="addOffice" id="addOffice" type="button" data-toggle="modal" data-target="#createOfficeModal">
+                        <i data-feather="plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                    <div class="alert alert-danger alert-icon" role="alert">
+                        <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <div class="alert-icon-aside">
+                            <i data-feather="alert-triangle"></i>
+                        </div>
+                        <div class="alert-icon-content">
+                            <h6 class="alert-heading">Error</h6>
+                            {{ error }}
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="datatable">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Office Name</th>
+                                <th>Office Code</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Office Name</th>
+                                <th>Office Code</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for office in offices %}
+                                <tr>
+                                    <td>{{ office.officename }}</td>
+                                    <td>{{ office.officecode }}</td>
+                                    {% if office.is_active %}
+                                        <td><div class="badge badge-success badge-pill">Active</div></td>
+                                    {% else %}
+                                        <td><div class="badge badge-warning badge-pill">Inactive</div></td>
+                                    {% endif %}
+                                    <td>
+                                        <a class="btn btn-datatable btn-icon btn-transparent-dark mr-2" href="{% url 'view_office' office.officeid %}"><i data-feather="eye"></i></a>
+                                        <a class="btn btn-datatable btn-icon btn-transparent-dark" href="{% url 'office_staff' office.officeid %}"><i data-feather="users"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

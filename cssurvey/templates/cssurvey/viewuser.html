@@ -22,10 +22,38 @@
     <div class="container mt-4">
         <!-- Account page navigation-->
         <nav class="nav nav-borders">
-            <a class="nav-link active ml-0" href="account-profile.html">Profile</a>
-            <a class="nav-link" href="account-security.html">Security</a>
+            <a class="nav-link active ml-0" href="{% url 'view_user' profile.id %}">Profile</a>
+            <a class="nav-link" href="{% url 'change_password' profile.id %}">Security</a>
         </nav>
         <hr class="mt-0 mb-4" />
+        {% if error %}
+            <div class="alert alert-danger alert-icon" role="alert">
+                <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="alert-icon-aside">
+                    <i data-feather="alert-triangle"></i>
+                </div>
+                <div class="alert-icon-content">
+                    <h6 class="alert-heading">Error</h6>
+                    {{ error }}
+                </div>
+            </div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success alert-icon" role="alert">
+                <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="alert-icon-aside">
+                    <i data-feather="pocket"></i>
+                </div>
+                <div class="alert-icon-content">
+                    <h6 class="alert-heading">Success</h6>
+                    {{ success }}
+                </div>
+            </div>
+        {% endif %}
         <div class="row">
             <div class="col-xl-4">
                 <!-- Profile picture card-->
@@ -46,7 +74,8 @@
                 <div class="card mb-4">
                     <div class="card-header">Account Details</div>
                     <div class="card-body">
-                        <form>
+                        <form method="POST" action="">
+                            {% csrf_token %}
                             <!-- Form Group (username)-->
                             <div class="form-group">
                                 <label class="small mb-1" for="username">Username</label>
@@ -87,8 +116,8 @@
                             <br>
                             <br>
                             <!-- Save changes button-->
-                            <a class="btn btn-primary mx-2 px-3" type="submit" role="button" href="{% url 'user_accounts' %}"><i class="mr-2" data-feather="arrow-left"></i> Back to User Page</a>
-                            <a class="btn btn-primary mx-2 px-3" type="submit" role="button"><i class="mr-2" data-feather="save"></i> Save changes</a>
+                            <a class="btn btn-primary mx-2 px-3" type="button" role="button" href="{% url 'user_accounts' %}"><i class="mr-2" data-feather="arrow-left"></i> Back to User Page</a>
+                            <button class="btn btn-primary mx-2 px-3" type="submit" role="button"><i class="mr-2" data-feather="save"></i> Save changes</button>
                         </form>
                     </div>
                 </div>

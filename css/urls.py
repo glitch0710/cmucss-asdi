@@ -38,5 +38,11 @@ urlpatterns = [
     path('cpanel/surveyquestions/<int:question_pk>/delete', views.delete_question, name='delete_question'),
     path('cpanel/users', views.user_accounts, name='user_accounts'),
     path('cpanel/users/<int:user_pk>', views.view_user, name='view_user'),
+    path('cpanel/users/<int:user_pk>/security', views.change_password, name='change_password'),
+    path('cpanel/users/<int:user_pk>/deactivate', views.deactivate_user, name='deactivate_user'),
+    path('cpanel/users/<int:user_pk>/reactivate', views.reactivate_user, name='reactivate_user'),
+    path('cpanel/offices', views.offices, name='offices'),
+    path('cpanel/offices/<int:office_pk>', views.view_office, name='view_office'),
+    path('cpanel/offices/<int:office_pk>/staff', views.office_staff, name='office_staff'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

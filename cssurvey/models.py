@@ -9,6 +9,7 @@ class TbCmuoffices(models.Model):
     officename = models.TextField(db_column='officeName', blank=True, null=True)  # Field name made lowercase.
     officecode = models.TextField(db_column='officeCode', blank=True, null=True)  # Field name made lowercase.
     scope = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return self.officename
@@ -121,16 +122,6 @@ class TbEmployees(models.Model):
         managed = False
         db_table = 'tb_employees'
 
-
-# @receiver(post_save, sender=User)
-# def create_user_profile(sender, instance, created, **kwargs):
-#     if created:
-#         TbEmployees.objects.create(user=instance)
-#
-#
-# @receiver(post_save, sender=User)
-# def save_user_profile(sender, instance, **kwargs):
-#     instance.profile.save()
 
 
 

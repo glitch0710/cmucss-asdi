@@ -123,5 +123,22 @@ class TbEmployees(models.Model):
         db_table = 'tb_employees'
 
 
+class Ticket(models.Model):
+    ticket_no = models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    complaint = models.TextField(blank=True, null=True)
+    date_filed = models.DateTimeField(db_column='dateCreated', auto_now_add=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    status = models.IntegerField(blank=True, null=True)
+    is_read = models.IntegerField(blank=True, null=True)
+    is_starred = models.IntegerField(blank=True, null=True)
+    office_id = models.ForeignKey('TbCmuoffices', models.DO_NOTHING)
+    assigned_to = models.ForeignKey(User, models.DO_NOTHING, related_name='assigned_to')
+    closed_by = models.ForeignKey(User, models.DO_NOTHING, related_name='closed_by')
+    closed_date = models.DateTimeField(blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'ticket'
 

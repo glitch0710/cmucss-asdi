@@ -127,6 +127,7 @@ class TbCmuoffices(models.Model):
     officename = models.TextField(db_column='officeName', blank=True, null=True)  # Field name made lowercase.
     officecode = models.TextField(db_column='officeCode', blank=True, null=True)  # Field name made lowercase.
     scope = models.TextField(blank=True, null=True)
+    is_active = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -217,3 +218,23 @@ class TbQuestions(models.Model):
     class Meta:
         managed = False
         db_table = 'tb_questions'
+
+
+class Ticket(models.Model):
+    ticket_no = models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    complaint = models.TextField(blank=True, null=True)
+    date_filed = models.DateTimeField(blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
+    status = models.IntegerField(blank=True, null=True)
+    is_read = models.IntegerField(blank=True, null=True)
+    is_starred = models.IntegerField(blank=True, null=True)
+    office_id = models.IntegerField(blank=True, null=True)
+    assigned_to = models.CharField(max_length=255, blank=True, null=True)
+    closed_by = models.CharField(max_length=255, blank=True, null=True)
+    closed_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ticket'

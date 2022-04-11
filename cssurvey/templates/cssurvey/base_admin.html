@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>OCSS Control Panel</title>
+        <title>{% block title %} {% endblock %}</title>
         <link href="{% static 'css1/styles.css' %}" rel="stylesheet" />
         <link rel="icon" type="image/x-icon" href="{% static 'assets/img/favicon.ico' %}" />
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
@@ -21,7 +21,7 @@
             <!-- * * Tip * * You can use text or an image for your navbar brand.-->
             <!-- * * * * * * When using an image, we recommend the SVG format.-->
             <!-- * * * * * * Dimensions: Maximum height: 32px, maximum width: 240px-->
-            <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a>
+            <a class="navbar-brand" href="{% url 'controlpanel' %}">{% block page_title %}{% endblock %}</a>
             <!-- Sidenav Toggle Button-->
             <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 mr-lg-2" id="sidebarToggle"><i data-feather="menu"></i></button>
             <!-- Navbar Search Input-->
@@ -123,46 +123,73 @@
                           </a>
 
                           <!-- Sidenav Menu Heading (Menu)-->
-                          <div class="sidenav-menu-heading">Menu</div>
+                          {% if user_group == 1 %}
+                              <div class="sidenav-menu-heading">Menu</div>
 
-                          <a class="nav-link" href="{% url 'controlpanel' %}">
-                              <div class="nav-link-icon"><i data-feather="activity"></i></div>
-                              Dashboard
-                          </a>
+                              <a class="nav-link" href="{% url 'controlpanel' %}">
+                                  <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                  Dashboard
+                              </a>
 
-                          <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse" data-target="#collapseDashboards" aria-expanded="false" aria-controls="collapseDashboards">
-                              <div class="nav-link-icon"><i data-feather="monitor"></i></div>
-                              Monitoring
-                              <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                          </a>
-                          <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
-                              <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
-                                  <a class="nav-link" href="{% url 'offices' %}">Offices</a>
-                                  <a class="nav-link" href="{% url 'questions' %}">Questions</a>
-                              </nav>
-                          </div>
+                              <a class="nav-link collapsed" href="javascript:void(0);" data-toggle="collapse" data-target="#collapseDashboards" aria-expanded="false" aria-controls="collapseDashboards">
+                                  <div class="nav-link-icon"><i data-feather="monitor"></i></div>
+                                  Monitoring
+                                  <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                              </a>
+                              <div class="collapse" id="collapseDashboards" data-parent="#accordionSidenav">
+                                  <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
+                                      <a class="nav-link" href="{% url 'offices' %}">Offices</a>
+                                      <a class="nav-link" href="{% url 'questions' %}">Questions</a>
+                                  </nav>
+                              </div>
+                              <!-- Sidenav Heading (Reports)-->
+                              <div class="sidenav-menu-heading">Reports</div>
+                              <!-- Sidenav Accordion (Data Visualization)-->
+                              <a class="nav-link" href="#">
+                                  <div class="nav-link-icon"><i data-feather="pie-chart"></i></div>
+                                  Data Visualization
+                              </a>
+                          {% endif %}
+
+                          {% if user_group == 3 %}
+                              <!-- Sidenav Heading (User Dashboard)-->
+                              <div class="sidenav-menu-heading">User</div>
+                              <!-- Sidenav Accordion (Dashboard)-->
+                              <a class="nav-link" href="{% url 'help_desk' %}">
+                                  <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
+                                  User Dashboard
+                              </a>
+                          {% endif %}
+
+                          {% if user_group == 2 %}
+                              <!-- Sidenav Heading (User Dashboard)-->
+                              <div class="sidenav-menu-heading">User</div>
+                              <!-- Sidenav Accordion (Dashboard)-->
+                              <a class="nav-link" href="#">
+                                  <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
+                                  User Dashboard
+                              </a>
+                              <div class="sidenav-menu-heading">Office</div>
+                              <a class="nav-link" href="#">
+                                  <div class="nav-link-icon"><i data-feather="monitor"></i></div>
+                                  Office Transaction
+                              </a>
+                          {% endif %}
+
                           <!-- Sidenav Heading (Reports)-->
-                          <div class="sidenav-menu-heading">Reports</div>
-                          <!-- Sidenav Accordion (Data Visualization)-->
-                          <a class="nav-link" href="#">
-                              <div class="nav-link-icon"><i data-feather="pie-chart"></i></div>
-                              Data Visualization
-                          </a>
+                          <div class="sidenav-menu-heading">Account Settings</div>
+                          {% if user_group == 1 %}
+                              <!-- Sidenav Accordion (User Accounts)-->
+                              <a class="nav-link" href="{% url 'user_accounts' %}">
+                                  <div class="nav-link-icon"><i data-feather="users"></i></div>
+                                  User Accounts
+                              </a>
+                          {% endif %}
 
-                          <!-- Sidenav Heading (User Dashboard)-->
-                          <div class="sidenav-menu-heading">User</div>
-                          <!-- Sidenav Accordion (Dashboard)-->
-                          <a class="nav-link" href="#">
-                              <div class="nav-link-icon"><i data-feather="monitor"></i></div>
-                              User Dashboard
-                          </a>
-
-                          <!-- Sidenav Heading (Reports)-->
-                          <div class="sidenav-menu-heading">Users</div>
                           <!-- Sidenav Accordion (User Accounts)-->
-                          <a class="nav-link" href="{% url 'user_accounts' %}">
-                              <div class="nav-link-icon"><i data-feather="users"></i></div>
-                              User Accounts
+                          <a class="nav-link" href="#!">
+                              <div class="nav-link-icon"><i data-feather="settings"></i></div>
+                              My Account
                           </a>
                       </div>
                   </div>

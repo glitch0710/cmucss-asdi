@@ -44,6 +44,7 @@ urlpatterns = [
     path('cpanel/offices', views.offices, name='offices'),
     path('cpanel/offices/<int:office_pk>', views.view_office, name='view_office'),
     path('cpanel/offices/<int:office_pk>/staff', views.office_staff, name='office_staff'),
+    path('helpdesk/', views.help_desk, name='help_desk'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'cssurvey.views.page_not_found_view'

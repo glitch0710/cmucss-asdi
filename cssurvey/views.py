@@ -31,7 +31,14 @@ def loginuser(request):
                                         'Please try again!'})
             else:
                 login(request, user)
-                return redirect('controlpanel')
+
+                if request.user.groups.all()[0].id == 1:
+                    return redirect('controlpanel')
+                elif request.user.groups.all()[0].id == 2:
+                    return HttpResponse('office admin')
+                elif request.user.groups.all()[0].id == 3:
+                    return redirect('help_desk')
+
         except ValidationError:
             return render(request,
                           'cssurvey/loginuser.html',
@@ -121,17 +128,29 @@ def submitcss(request):
 
 @login_required
 def controlpanel(request):
-    return render(request, 'cssurvey/controlpanel.html')
+    user_group = request.user.groups.all()[0].id
+    if user_group != 1:
+        return HttpResponse('BAWAL')
+    else:
+        return render(request, 'cssurvey/controlpanel.html', {'user_group': user_group})
+
+
+@login_required
+def help_desk(request):
+    user_group = request.user.groups.all()[0].id
+    return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group})
 
 
 @login_required
 def questions(request):
+    user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
         active_questions = TbQuestions.objects.filter(display_status=1)
         inactive_questions = TbQuestions.objects.filter(display_status=0)
         return render(request, 'cssurvey/questions.html', {'active': active_questions,
                                                            'inactive': inactive_questions,
-                                                           'searched': '',})
+                                                           'searched': '',
+                                                           'user_group': user_group})
 
     else:
         search_data = request.POST
@@ -139,15 +158,19 @@ def questions(request):
 
         return render(request, 'cssurvey/questions.html', {'active': '',
                                                            'inactive': '',
-                                                           'searched': return_question_data,})
+                                                           'searched': return_question_data,
+                                                           'user_group': user_group})
 
 
 @login_required
 def viewquestion(request, question_pk):
+    user_group = request.user.groups.all()[0].id
     question = get_object_or_404(TbQuestions, pk=question_pk)
     if request.method == 'GET':
         form = TbQuestionsForm(instance=question)
-        return render(request, 'cssurvey/viewquestion.html', {'question': question, 'form': form})
+        return render(request, 'cssurvey/viewquestion.html', {'question': question,
+                                                              'form': form,
+                                                              'user_group': user_group})
     else:
         try:
             form = TbQuestionsForm(request.POST, instance=question)
@@ -159,11 +182,13 @@ def viewquestion(request, question_pk):
         except ValueError:
             return render(request, 'cssurvey/viewquestion.html', {'question': question,
                                                                   'form': form,
-                                                                  'error': 'Bad data passed in!'})
+                                                                  'error': 'Bad data passed in!',
+                                                                  'user_group': user_group})
 
 
 @login_required
 def create_question(request):
+    user_group = request.user.groups.all()[0].id
     if request.method == 'POST':
         try:
             new_question = TbQuestionsForm(request.POST)
@@ -180,18 +205,21 @@ def create_question(request):
                 return render(request, 'cssurvey/questions.html', {'active': active_questions,
                                                                    'inactive': inactive_questions,
                                                                    'searched': '',
-                                                                   'error': 'Bad data passed in. Please try again!'})
+                                                                   'error': 'Bad data passed in. Please try again!',
+                                                                   'user_group': user_group})
         except ValueError:
             active_questions = TbQuestions.objects.filter(display_status=1)
             inactive_questions = TbQuestions.objects.filter(display_status=0)
             return render(request, 'cssurvey/questions.html', {'active': active_questions,
                                                                'inactive': inactive_questions,
                                                                'searched': '',
-                                                               'error': 'Bad data passed in. Please try again!'})
+                                                               'error': 'Bad data passed in. Please try again!',
+                                                               'user_group': user_group})
 
 
 @login_required
 def delete_question(request, question_pk):
+    user_group = request.user.groups.all()[0].id
     del_question = get_object_or_404(TbQuestions, pk=question_pk)
     if request.method == 'POST':
         if del_question.display_status:
@@ -203,6 +231,7 @@ def delete_question(request, question_pk):
 
 @login_required
 def user_accounts(request):
+    user_group = request.user.groups.all()[0].id
     form_profile = TbEmployeesForm()
     userid = request.user.id
     if request.method == 'GET':
@@ -213,7 +242,8 @@ def user_accounts(request):
                                                               'form1': UserChangeForm(),
                                                               'users': users,
                                                               'form_profile': form_profile,
-                                                              'userid': userid})
+                                                              'userid': userid,
+                                                              'user_group': user_group})
     else:
         if request.POST['password1'] == request.POST['password2']:
             try:
@@ -243,7 +273,8 @@ def user_accounts(request):
                                                                       'form_profile': form_profile,
                                                                       'error': 'That username has already been taken.'
                                                                                ' Please choose a new username',
-                                                                      'userid': userid})
+                                                                      'userid': userid,
+                                                                      'user_group': user_group})
             except ValueError:
                 user = get_user_model()
                 users = user.objects.all()
@@ -252,7 +283,8 @@ def user_accounts(request):
                                                                       'users': users,
                                                                       'form_profile': form_profile,
                                                                       'error': 'Bad data passed in. Please try again.',
-                                                                      'userid': userid})
+                                                                      'userid': userid,
+                                                                      'user_group': user_group})
 
         else:
             user = get_user_model()
@@ -263,18 +295,21 @@ def user_accounts(request):
                                                                   'users': users,
                                                                   'form_profile': form_profile,
                                                                   'error': 'Passwords did not match',
-                                                                  'userid': userid})
+                                                                  'userid': userid,
+                                                                  'user_group': user_group})
 
 
 @login_required
 def view_user(request, user_pk):
+    user_group = request.user.groups.all()[0].id
     user_details = get_object_or_404(User, pk=user_pk)
     user_profile = get_object_or_404(TbEmployees, user=user_pk)
     form_profile = TbEmployeesForm(instance=user_profile)
     if request.method == 'GET':
         return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
                                                           'profile': user_details,
-                                                          'profile_details': user_profile})
+                                                          'profile_details': user_profile,
+                                                          'user_group': user_group})
     else:
         try:
             user_form = UserChangeUpdateForm(request.POST, instance=user_details)
@@ -293,24 +328,28 @@ def view_user(request, user_pk):
                 return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
                                                                   'profile': user_details,
                                                                   'profile_details': user_profile,
-                                                                  'success': 'Profile update successfully saved'})
+                                                                  'success': 'Profile update successfully saved',
+                                                                  'user_group': user_group})
             else:
                 return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
                                                                   'profile': user_details,
                                                                   'profile_details': user_profile,
-                                                                  'error': 'Form did not validate. Please try again'})
+                                                                  'error': 'Form did not validate. Please try again',
+                                                                  'user_group': user_group})
         except ValueError:
             return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
                                                               'profile': user_details,
                                                               'profile_details': user_profile,
-                                                              'error': 'Bad data passed in. Please try again'})
+                                                              'error': 'Bad data passed in. Please try again',
+                                                              'user_group': user_group})
 
 
 @login_required()
 def change_password(request, user_pk):
+    user_group = request.user.groups.all()[0].id
     user_details = get_object_or_404(User, pk=user_pk)
     if request.method == 'GET':
-        return render(request, 'cssurvey/changepassword.html', {'profile': user_details,})
+        return render(request, 'cssurvey/changepassword.html', {'profile': user_details, 'user_group': user_group})
     else:
         try:
             new_password = request.POST['new_password1'].strip()
@@ -324,14 +363,17 @@ def change_password(request, user_pk):
                 user_details.save()
                 return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
                                                                         'success': 'User\'s password was successfully updated.',
+                                                                        'user_group': user_group,
                                                                         })
             else:
                 return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
                                                                         'error': 'Passwords do not match! Please try again.',
+                                                                        'user_group': user_group,
                                                                         })
         except ValueError:
             return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
                                                                     'error': 'Bad data passed in. Please try again.',
+                                                                    'user_group': user_group,
                                                                     })
 
     # change password for user
@@ -365,10 +407,12 @@ def reactivate_user(request, user_pk):
 
 @login_required
 def offices(request):
+    user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
         all_offices = TbCmuoffices.objects.all()
         return render(request, 'cssurvey/offices.html', {'offices': all_offices,
-                                                         'form': TbCmuOfficesAddForm})
+                                                         'form': TbCmuOfficesAddForm,
+                                                         'user_group': user_group,})
     else:
         try:
             submit_form = TbCmuOfficesAddForm(request.POST)
@@ -380,21 +424,25 @@ def offices(request):
                 all_offices = TbCmuoffices.objects.all()
                 return render(request, 'cssurvey/offices.html', {'offices': all_offices,
                                                                  'form': TbCmuOfficesAddForm,
-                                                                 'error': 'Form did not validate. Please try again.'})
+                                                                 'error': 'Form did not validate. Please try again.',
+                                                                 'user_group': user_group,})
         except ValueError:
             all_offices = TbCmuoffices.objects.all()
             return render(request, 'cssurvey/offices.html', {'offices': all_offices,
                                                              'form': TbCmuOfficesAddForm,
-                                                             'error': 'Bad data passed in. Please try again.'})
+                                                             'error': 'Bad data passed in. Please try again.',
+                                                             'user_group': user_group,})
 
 
 @login_required
 def view_office(request, office_pk):
+    user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
         office = get_object_or_404(TbCmuoffices, pk=office_pk)
         form = TbCmuOfficesForm(instance=office)
         return render(request, 'cssurvey/viewoffice.html', {'office': office,
-                                                            'form': form})
+                                                            'form': form,
+                                                            'user_group': user_group,})
     else:
         office = get_object_or_404(TbCmuoffices, pk=office_pk)
         form = TbCmuOfficesForm(instance=office)
@@ -406,20 +454,24 @@ def view_office(request, office_pk):
             else:
                 return render(request, 'cssurvey/viewoffice.html', {'office': office,
                                                                     'form': form,
-                                                                    'error': 'Form did not validate, please try again.'})
+                                                                    'error': 'Form did not validate, please try again.',
+                                                                    'user_group': user_group,})
         except ValueError:
             return render(request, 'cssurvey/viewoffice.html', {'office': office,
                                                                 'form': form,
-                                                                'error': 'Bad data passed in. Please try again.'})
+                                                                'error': 'Bad data passed in. Please try again.',
+                                                                'user_group': user_group,})
 
 
 @login_required
 def office_staff(request, office_pk):
+    user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
         office = get_object_or_404(TbCmuoffices, pk=office_pk)
         staff = User.objects.filter(tbemployees__office_id=office)
         return render(request, 'cssurvey/officestaff.html', {'office': office,
-                                                             'staff': staff})
+                                                             'staff': staff,
+                                                             'user_group': user_group,})
     else:
         pass
 

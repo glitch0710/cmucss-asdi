@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, User
 from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import HttpResponse
@@ -176,14 +177,13 @@ def viewquestion(request, question_pk):
             form = TbQuestionsForm(request.POST, instance=question)
             if form.is_valid():
                 form.save()
-                return redirect('questions')
+                messages.success(request, 'Changes has been saved successfully.')
+                return redirect('viewquestion', question_pk=question_pk)
             else:
                 raise ValueError
         except ValueError:
-            return render(request, 'cssurvey/viewquestion.html', {'question': question,
-                                                                  'form': form,
-                                                                  'error': 'Bad data passed in!',
-                                                                  'user_group': user_group})
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('viewquestion', question_pk=question_pk)
 
 
 @login_required
@@ -198,23 +198,15 @@ def create_question(request):
                     raise ValueError
                 else:
                     new_question.save()
+                    messages.success(request, 'New question has been created')
                     return redirect('questions')
             else:
-                active_questions = TbQuestions.objects.filter(display_status=1)
-                inactive_questions = TbQuestions.objects.filter(display_status=0)
-                return render(request, 'cssurvey/questions.html', {'active': active_questions,
-                                                                   'inactive': inactive_questions,
-                                                                   'searched': '',
-                                                                   'error': 'Bad data passed in. Please try again!',
-                                                                   'user_group': user_group})
+                messages.error(request, 'Bad data passed in. Please try again!')
+                return redirect('questions')
+
         except ValueError:
-            active_questions = TbQuestions.objects.filter(display_status=1)
-            inactive_questions = TbQuestions.objects.filter(display_status=0)
-            return render(request, 'cssurvey/questions.html', {'active': active_questions,
-                                                               'inactive': inactive_questions,
-                                                               'searched': '',
-                                                               'error': 'Bad data passed in. Please try again!',
-                                                               'user_group': user_group})
+            messages.error(request, 'Bad data passed in. Please try again!')
+            return redirect('questions')
 
 
 @login_required
@@ -223,10 +215,15 @@ def delete_question(request, question_pk):
     del_question = get_object_or_404(TbQuestions, pk=question_pk)
     if request.method == 'POST':
         if del_question.display_status:
+            messages.warning(request, 'Cannot perform requested task. The question is still active.')
             return redirect('viewquestion', question_pk=del_question.qid)
         else:
             del_question.delete()
+            messages.success(request, 'The survey question has been deleted.')
             return redirect('questions')
+    else:
+        messages.warning(request, 'Bad request')
+        return redirect('questions')
 
 
 @login_required
@@ -263,40 +260,73 @@ def user_accounts(request):
                 TbEmployees.objects.create(office_id=TbCmuoffices.objects.get(officeid=office_id),
                                            job_position=request.POST['job_position'],
                                            user=User.objects.get(id=User.objects.latest('id').id))
+                messages.success(request, 'New user has been created')
                 return redirect('user_accounts')
+
             except IntegrityError:
-                user = get_user_model()
-                users = user.objects.all()
-                return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm(),
-                                                                      'form1': UserChangeForm(),
-                                                                      'users': users,
-                                                                      'form_profile': form_profile,
-                                                                      'error': 'That username has already been taken.'
-                                                                               ' Please choose a new username',
-                                                                      'userid': userid,
-                                                                      'user_group': user_group})
+                messages.error(request, 'That username has already been taken. Please choose a new username')
+                return redirect('user_accounts')
+
             except ValueError:
-                user = get_user_model()
-                users = user.objects.all()
-                return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm(),
-                                                                      'form1': UserChangeForm(),
-                                                                      'users': users,
-                                                                      'form_profile': form_profile,
-                                                                      'error': 'Bad data passed in. Please try again.',
-                                                                      'userid': userid,
-                                                                      'user_group': user_group})
+                messages.error(request, 'Bad data passed in. Please try again.')
+                return redirect('user_accounts')
 
         else:
-            user = get_user_model()
-            users = user.objects.all()
+            messages.error(request, 'Passwords did not match. Please try again.')
+            return redirect('user_accounts')
 
-            return render(request, 'cssurvey/useraccounts.html', {'form': UserCreationForm(),
-                                                                  'form1': UserChangeForm(),
-                                                                  'users': users,
-                                                                  'form_profile': form_profile,
-                                                                  'error': 'Passwords did not match',
-                                                                  'userid': userid,
-                                                                  'user_group': user_group})
+
+@login_required
+def my_account(request):
+    user_group = request.user.groups.all()[0].id
+    my_acc = get_object_or_404(User, pk=request.user.id)
+    my_det = get_object_or_404(TbEmployees, user=request.user.id)
+    form_profile = TbEmployeesForm(instance=my_det)
+    if request.method == 'GET':
+        return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
+                                                          'profile': my_acc,
+                                                          'profile_details': my_det,
+                                                          'user_group': user_group,
+                                                          'own': True,})
+    else:
+        user_form = UserChangeUpdateForm(request.POST, instance=my_acc)
+        details_form = UserProfileUpdateForm(request.POST, instance=my_det)
+
+        try:
+            if user_form.is_valid() and details_form.is_valid():
+                user_form.save()
+                details_form.save()
+                messages.success(request, 'Changes has been successfully saved!')
+                return redirect('my_account')
+            else:
+                messages.error(request, 'Form did not validate. Please try again')
+                return redirect('my_account')
+        except ValueError:
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('my_account')
+
+
+@login_required
+def my_password(request):
+    # change password for user
+    user_group = request.user.groups.all()[0].id
+    user_details = get_object_or_404(User, username=request.user)
+    form = PasswordChangeForm(request.user)
+    if request.method == 'GET':
+        return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
+                                                                'own': True,
+                                                                'user_group': user_group,
+                                                                'form': form})
+    else:
+        form = PasswordChangeForm(data=request.POST, user=request.user)
+        if form.is_valid():
+            user = form.save(commit=True)
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('my_password')
+        else:
+            messages.error(request, 'Bad data passed in! Please try again.')
+            return redirect('my_password')
 
 
 @login_required
@@ -325,26 +355,17 @@ def view_user(request, user_pk):
 
                 user_form.save()
                 details_form.save()
-                return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
-                                                                  'profile': user_details,
-                                                                  'profile_details': user_profile,
-                                                                  'success': 'Profile update successfully saved',
-                                                                  'user_group': user_group})
+                messages.success(request, 'Profile update successfully saved')
+                return redirect('view_user', user_pk=user_pk)
             else:
-                return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
-                                                                  'profile': user_details,
-                                                                  'profile_details': user_profile,
-                                                                  'error': 'Form did not validate. Please try again',
-                                                                  'user_group': user_group})
+                messages.error(request, 'Form did not validate. Please try again')
+                return redirect('view_user', user_pk=user_pk)
         except ValueError:
-            return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
-                                                              'profile': user_details,
-                                                              'profile_details': user_profile,
-                                                              'error': 'Bad data passed in. Please try again',
-                                                              'user_group': user_group})
+            messages.error(request, 'Bad data passed in. Please try again')
+            return redirect('view_user', user_pk=user_pk)
 
 
-@login_required()
+@login_required
 def change_password(request, user_pk):
     user_group = request.user.groups.all()[0].id
     user_details = get_object_or_404(User, pk=user_pk)
@@ -361,48 +382,40 @@ def change_password(request, user_pk):
             if new_password == confirm_password:
                 user_details.set_password(new_password)
                 user_details.save()
-                return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
-                                                                        'success': 'User\'s password was successfully updated.',
-                                                                        'user_group': user_group,
-                                                                        })
+                messages.success(request, 'User\'s password was successfully updated.')
+                return redirect('change_password', user_pk=user_pk)
             else:
-                return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
-                                                                        'error': 'Passwords do not match! Please try again.',
-                                                                        'user_group': user_group,
-                                                                        })
+                messages.error(request, 'Passwords do not match! Please try again.')
+                return redirect('change_password', user_pk=user_pk)
         except ValueError:
-            return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
-                                                                    'error': 'Bad data passed in. Please try again.',
-                                                                    'user_group': user_group,
-                                                                    })
-
-    # change password for user
-    # user_details = get_object_or_404(User, pk=user_pk)
-    # if request.method == 'GET':
-    #     return render(request, 'cssurvey/changepassword.html', {'profile': user_details})
-    # else:
-    #     form = PasswordChangeForm(user_details, request.POST)
-    #     if form.is_valid():
-    #         user = form.save()
-    #         update_session_auth_hash(request, user)
-    #         return render(request, 'cssurvey/changepassword.html', {'profile': user_details,
-    #                                                                 'success': 'Password was successfully updated'})
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('change_password', user_pk=user_pk)
 
 
 @login_required
 def deactivate_user(request, user_pk):
-    deactivate = get_object_or_404(User, pk=user_pk)
-    deactivate.is_active = 0
-    deactivate.save()
-    return redirect('user_accounts')
+    if request.method == 'POST':
+        deactivate = get_object_or_404(User, pk=user_pk)
+        deactivate.is_active = 0
+        deactivate.save()
+        messages.info(request, 'The user has been deactivated.')
+        return redirect('user_accounts')
+    else:
+        messages.warning(request, 'Bad request')
+        return redirect('user_accounts')
 
 
 @login_required
 def reactivate_user(request, user_pk):
-    reactivate = get_object_or_404(User, pk=user_pk)
-    reactivate.is_active = 1
-    reactivate.save()
-    return redirect('user_accounts')
+    if request.method == 'POST':
+        reactivate = get_object_or_404(User, pk=user_pk)
+        reactivate.is_active = 1
+        reactivate.save()
+        messages.success(request, 'The user has been reactivated.')
+        return redirect('user_accounts')
+    else:
+        messages.warning(request, 'Bad request')
+        return redirect('user_accounts')
 
 
 @login_required
@@ -419,19 +432,14 @@ def offices(request):
 
             if submit_form.is_valid():
                 submit_form.save()
+                messages.success(request, 'New office has been created')
                 return redirect('offices')
             else:
-                all_offices = TbCmuoffices.objects.all()
-                return render(request, 'cssurvey/offices.html', {'offices': all_offices,
-                                                                 'form': TbCmuOfficesAddForm,
-                                                                 'error': 'Form did not validate. Please try again.',
-                                                                 'user_group': user_group,})
+                messages.error(request, 'Form did not validate. Please try again.')
+                return redirect('offices')
         except ValueError:
-            all_offices = TbCmuoffices.objects.all()
-            return render(request, 'cssurvey/offices.html', {'offices': all_offices,
-                                                             'form': TbCmuOfficesAddForm,
-                                                             'error': 'Bad data passed in. Please try again.',
-                                                             'user_group': user_group,})
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('offices')
 
 
 @login_required
@@ -450,17 +458,14 @@ def view_office(request, office_pk):
         try:
             if office_form.is_valid():
                 office_form.save()
+                messages.success(request, 'Changes has been saved successfully')
                 return redirect('view_office', office_pk=office.officeid)
             else:
-                return render(request, 'cssurvey/viewoffice.html', {'office': office,
-                                                                    'form': form,
-                                                                    'error': 'Form did not validate, please try again.',
-                                                                    'user_group': user_group,})
+                messages.error(request, 'Form did not validate, please try again.')
+                return redirect('view_office', office_pk=office.officeid)
         except ValueError:
-            return render(request, 'cssurvey/viewoffice.html', {'office': office,
-                                                                'form': form,
-                                                                'error': 'Bad data passed in. Please try again.',
-                                                                'user_group': user_group,})
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('view_office', office_pk=office.officeid)
 
 
 @login_required

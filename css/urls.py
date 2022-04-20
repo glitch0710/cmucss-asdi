@@ -46,7 +46,16 @@ urlpatterns = [
     path('cpanel/offices/<int:office_pk>/staff', views.office_staff, name='office_staff'),
     path('cpanel/account', views.my_account, name='my_account'),
     path('cpanel/account/security', views.my_password, name='my_password'),
+
+    # Help Desk
     path('helpdesk/', views.help_desk, name='help_desk'),
+    path('helpdesk/newticket', views.create_ticket, name='create_ticket'),
+    path('helpdesk/ticket/<int:ticket_id>', views.view_ticket, name='view_ticket'),
+    path('helpdesk/ticket/<int:ticket_id>/close', views.close_ticket, name='close_ticket'),
+    path('helpdesk/ticket/<int:ticket_id>/decline', views.decline_ticket, name='decline_ticket'),
+    path('helpdesk/ticket/active', views.active_ticket, name='active_ticket'),
+    path('helpdesk/ticket/closed', views.closed_ticket, name='closed_ticket'),
+    path('helpdesk/ticket/declined', views.declined_ticket, name='declined_ticket'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'cssurvey.views.page_not_found_view'

@@ -128,17 +128,29 @@ class Ticket(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     complaint = models.TextField(blank=True, null=True)
-    date_filed = models.DateTimeField(db_column='dateCreated', auto_now_add=True)
+    date_filed = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(max_length=255, blank=True, null=True)
-    status = models.IntegerField(blank=True, null=True)
-    is_read = models.IntegerField(blank=True, null=True)
-    is_starred = models.IntegerField(blank=True, null=True)
-    office_id = models.ForeignKey('TbCmuoffices', models.DO_NOTHING)
-    assigned_to = models.ForeignKey(User, models.DO_NOTHING, related_name='assigned_to')
-    closed_by = models.ForeignKey(User, models.DO_NOTHING, related_name='closed_by')
+    status = models.IntegerField(default=1)
+    is_read = models.BooleanField(default=False)
+    is_starred = models.BooleanField(default=False)
+    office_id = models.ForeignKey('TbCmuoffices', models.DO_NOTHING, db_column='office_id')
+    assigned_to = models.ForeignKey(User, models.DO_NOTHING, related_name='assigned_to', db_column='assigned_to')
+    closed_by = models.ForeignKey(User, models.DO_NOTHING, related_name='closed_by', db_column='closed_by')
     closed_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'ticket'
+
+
+class GeneratedLinks(models.Model):
+    ticket_id = models.OneToOneField(Ticket, on_delete=models.CASCADE, db_column='ticket_id')
+    token = models.CharField(max_length=255, blank=True, null=True)
+    generated_link = models.CharField(max_length=255, blank=True, null=True)
+    respondentid = models.ForeignKey('TbCssrespondents',models.DO_NOTHING, db_column='respondentid')
+    status = models.BooleanField(default=False)
+
+    class Meta:
+        managed = False
+        db_table = 'generated_links'
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails, TbEmployees
-from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm, TbEmployeesForm, UserChangeUpdateForm, UserProfileUpdateForm, TbCmuOfficesForm, TbCmuOfficesAddForm
+from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails, TbEmployees, Ticket
+from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm, TbEmployeesForm, UserChangeUpdateForm, UserProfileUpdateForm, TbCmuOfficesForm, TbCmuOfficesAddForm, CreateTicketForm
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.models import User
@@ -9,6 +9,8 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import HttpResponse
+from django.core.paginator import Paginator
+import datetime
 
 
 def page_not_found_view(request, exception):
@@ -134,12 +136,6 @@ def controlpanel(request):
         return HttpResponse('BAWAL')
     else:
         return render(request, 'cssurvey/controlpanel.html', {'user_group': user_group})
-
-
-@login_required
-def help_desk(request):
-    user_group = request.user.groups.all()[0].id
-    return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group})
 
 
 @login_required
@@ -282,12 +278,28 @@ def my_account(request):
     my_acc = get_object_or_404(User, pk=request.user.id)
     my_det = get_object_or_404(TbEmployees, user=request.user.id)
     form_profile = TbEmployeesForm(instance=my_det)
+
+    user_office = TbEmployees.objects.get(user=request.user.id).office_id
+    ticket_open = Ticket.objects.filter(office_id=user_office,
+                                        assigned_to=request.user.id,
+                                        status=1).count()
+
+    ticket_close = Ticket.objects.filter(office_id=user_office,
+                                         assigned_to=request.user.id,
+                                         status=3).count()
+
+    ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                            assigned_to=request.user.id,
+                                            status=2).count()
     if request.method == 'GET':
         return render(request, 'cssurvey/viewuser.html', {'form_profile': form_profile,
                                                           'profile': my_acc,
                                                           'profile_details': my_det,
                                                           'user_group': user_group,
-                                                          'own': True,})
+                                                          'own': True,
+                                                          'ticket_open': ticket_open,
+                                                          'ticket_close': ticket_close,
+                                                          'ticket_declined': ticket_declined,})
     else:
         user_form = UserChangeUpdateForm(request.POST, instance=my_acc)
         details_form = UserProfileUpdateForm(request.POST, instance=my_det)
@@ -480,3 +492,330 @@ def office_staff(request, office_pk):
     else:
         pass
 
+
+@login_required
+def help_desk(request):
+    if request.method == 'GET':
+        try:
+            user_group = request.user.groups.all()[0].id
+            user_office = TbEmployees.objects.get(user=request.user.id).office_id
+
+            ticket_open = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=1).count()
+
+            ticket_close = Ticket.objects.filter(office_id=user_office,
+                                                 assigned_to=request.user.id,
+                                                 status=3).count()
+
+            ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=2).count()
+
+            ticket_list = Ticket.objects.filter(office_id=user_office, assigned_to=request.user.id).order_by('-id')
+            paginator = Paginator(ticket_list, 5)
+            next_ticket_no = Ticket.objects.latest('id').id + 1
+
+            page_number = request.GET.get('page')
+            tickets = paginator.get_page(page_number)
+            nums = 'a' * tickets.paginator.num_pages
+            return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group,
+                                                                       'tickets': tickets,
+                                                                       'nums': nums,
+                                                                       'searched': False,
+                                                                       'next_ticket': next_ticket_no,
+                                                                       'create_ticket': CreateTicketForm,
+                                                                       'user_office': user_office,
+                                                                       'ticket_open': ticket_open,
+                                                                       'ticket_close': ticket_close,
+                                                                       'ticket_declined': ticket_declined,})
+        except ValueError:
+            messages.error(request, 'Error loading the page. Please try again')
+            return redirect('help_desk')
+    else:
+        user_group = request.user.groups.all()[0].id
+        data_searched = request.POST
+        user_office = TbEmployees.objects.get(user=request.user.id).office_id
+        next_ticket_no = Ticket.objects.latest('id').id + 1
+
+        ticket_open = Ticket.objects.filter(office_id=user_office,
+                                            assigned_to=request.user.id,
+                                            status=1).count()
+
+        ticket_close = Ticket.objects.filter(office_id=user_office,
+                                             assigned_to=request.user.id,
+                                             status=3).count()
+
+        ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=2).count()
+
+        return_ticket = Ticket.objects.filter(id__icontains=data_searched.get('search_ticket'),
+                                              office_id=user_office,
+                                              assigned_to=request.user.id).order_by('-id')
+        paginator = Paginator(return_ticket, 5)
+        page_number = request.GET.get('page')
+        tickets = paginator.get_page(page_number)
+        nums = 'a' * tickets.paginator.num_pages
+        return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group,
+                                                                   'tickets': return_ticket,
+                                                                   'nums': nums,
+                                                                   'searched': True,
+                                                                   'next_ticket': next_ticket_no,
+                                                                   'create_ticket': CreateTicketForm,
+                                                                   'user_office': user_office,
+                                                                   'ticket_open': ticket_open,
+                                                                   'ticket_close': ticket_close,
+                                                                   'ticket_declined': ticket_declined,})
+
+
+@login_required
+def create_ticket(request):
+    if request.method == 'POST':
+        try:
+            user_office = TbEmployees.objects.get(user=request.user.id).office_id
+            next_ticket_no = Ticket.objects.latest('id').id + 1
+
+            new_ticket = CreateTicketForm(request.POST)
+            if new_ticket.is_valid():
+                ticket = new_ticket.save(commit=False)
+                ticket.office_id = user_office
+                ticket.ticket_no = next_ticket_no
+                ticket.assigned_to = User.objects.get(username=request.user)
+                ticket.save()
+
+                messages.success(request, 'New ticket has been submitted')
+                return redirect('help_desk')
+            else:
+                raise ValidationError
+        except ValidationError:
+            messages.error(request, 'Form did not validate. Please try again.')
+            return redirect('help_desk')
+
+        except ValueError:
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('help_desk')
+
+
+@login_required
+def view_ticket(request, ticket_id):
+    try:
+        user_group = request.user.groups.all()[0].id
+        user_office = TbEmployees.objects.get(user=request.user.id).office_id
+        ticket_open = Ticket.objects.filter(office_id=user_office,
+                                            assigned_to=request.user.id,
+                                            status=1).count()
+
+        ticket_closed = Ticket.objects.filter(office_id=user_office,
+                                              assigned_to=request.user.id,
+                                              status=3).count()
+
+        ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=2).count()
+
+        if request.method == 'GET':
+            ticket_details = get_object_or_404(Ticket, pk=ticket_id, assigned_to=request.user.id)
+            try:
+                ticket_details.is_read = 1
+                ticket_details.save()
+            except ValueError:
+                messages.error(request, 'Something went wrong. Please try again')
+                return redirect('view_ticket')
+
+            return render(request, 'cssurvey/helpdesk/supportticket.html', {'ticket': ticket_details,
+                                                                            'user_group': user_group,
+                                                                            'ticket_open': ticket_open,
+                                                                            'ticket_close': ticket_closed,
+                                                                            'ticket_declined': ticket_declined,})
+    except ValueError:
+        messages.error(request, 'Something went wrong. Please try again')
+        return redirect('view_ticket')
+
+
+@login_required
+def close_ticket(request, ticket_id):
+    if request.method == 'POST':
+        user_group = request.user.groups.all()[0].id
+        user_office = TbEmployees.objects.get(user=request.user.id).office_id
+
+        ticket_close = get_object_or_404(Ticket, pk=ticket_id, assigned_to=request.user.id)
+        ticket_close.status = 3
+        ticket_close.closed_by = User.objects.get(username=request.user)
+        ticket_close.closed_date = datetime.datetime.now()
+        ticket_close.save()
+
+        ticket_open = Ticket.objects.filter(office_id=user_office,
+                                            assigned_to=request.user.id,
+                                            status=1).count()
+
+        ticket_closed = Ticket.objects.filter(office_id=user_office,
+                                              assigned_to=request.user.id,
+                                              status=3).count()
+
+        ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=2).count()
+
+        return render(request, 'cssurvey/helpdesk/generatelink.html', {'user_group': user_group,
+                                                                       'ticket': ticket_close,
+                                                                       'ticket_open': ticket_open,
+                                                                       'ticket_close': ticket_closed,
+                                                                       'ticket_declined': ticket_declined,})
+    else:
+        messages.error(request, 'Bad request')
+        return redirect('help_desk')
+
+
+@login_required
+def decline_ticket(request, ticket_id):
+    if request.method == 'POST':
+        try:
+            ticket_decline = get_object_or_404(Ticket, pk=ticket_id, assigned_to=request.user.id)
+            ticket_decline.status = 2
+            ticket_decline.closed_by = User.objects.get(username=request.user)
+            ticket_decline.closed_date = datetime.datetime.now()
+            ticket_decline.save()
+
+            messages.success(request, 'This ticket has been marked as declined')
+            return redirect('view_ticket', ticket_id=ticket_id)
+        except ValueError:
+            messages.error(request, 'Bad data passed in. Please try again.')
+            return redirect('help_desk')
+    else:
+        messages.error(request, 'Bad request')
+        return redirect('help_desk')
+
+
+@login_required
+def active_ticket(request):
+    if request.method == 'GET':
+        try:
+            user_group = request.user.groups.all()[0].id
+            user_office = TbEmployees.objects.get(user=request.user.id).office_id
+
+            ticket_open = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=1).count()
+
+            ticket_close = Ticket.objects.filter(office_id=user_office,
+                                                 assigned_to=request.user.id,
+                                                 status=3).count()
+
+            ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=2).count()
+
+            ticket_list = Ticket.objects.filter(office_id=user_office,
+                                                assigned_to=request.user.id,
+                                                status=1).order_by('-id')
+
+            paginator = Paginator(ticket_list, 5)
+            next_ticket_no = Ticket.objects.latest('id').id + 1
+
+            page_number = request.GET.get('page')
+            tickets = paginator.get_page(page_number)
+            nums = 'a' * tickets.paginator.num_pages
+            return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group,
+                                                                       'tickets': tickets,
+                                                                       'nums': nums,
+                                                                       'searched': False,
+                                                                       'next_ticket': next_ticket_no,
+                                                                       'create_ticket': CreateTicketForm,
+                                                                       'user_office': user_office,
+                                                                       'ticket_open': ticket_open,
+                                                                       'ticket_close': ticket_close,
+                                                                       'ticket_declined': ticket_declined,})
+        except ValueError:
+            messages.error(request, 'Error loading the page. Please try again')
+            return redirect('help_desk')
+
+
+@login_required
+def closed_ticket(request):
+    if request.method == 'GET':
+        if request.method == 'GET':
+            try:
+                user_group = request.user.groups.all()[0].id
+                user_office = TbEmployees.objects.get(user=request.user.id).office_id
+
+                ticket_open = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=1).count()
+
+                ticket_close = Ticket.objects.filter(office_id=user_office,
+                                                     assigned_to=request.user.id,
+                                                     status=3).count()
+
+                ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                        assigned_to=request.user.id,
+                                                        status=2).count()
+
+                ticket_list = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=3).order_by('-id')
+
+                paginator = Paginator(ticket_list, 5)
+                next_ticket_no = Ticket.objects.latest('id').id + 1
+
+                page_number = request.GET.get('page')
+                tickets = paginator.get_page(page_number)
+                nums = 'a' * tickets.paginator.num_pages
+                return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group,
+                                                                           'tickets': tickets,
+                                                                           'nums': nums,
+                                                                           'searched': False,
+                                                                           'next_ticket': next_ticket_no,
+                                                                           'create_ticket': CreateTicketForm,
+                                                                           'user_office': user_office,
+                                                                           'ticket_open': ticket_open,
+                                                                           'ticket_close': ticket_close,
+                                                                           'ticket_declined': ticket_declined, })
+            except ValueError:
+                messages.error(request, 'Error loading the page. Please try again')
+                return redirect('help_desk')
+
+
+@login_required
+def declined_ticket(request):
+    if request.method == 'GET':
+        if request.method == 'GET':
+            try:
+                user_group = request.user.groups.all()[0].id
+                user_office = TbEmployees.objects.get(user=request.user.id).office_id
+
+                ticket_open = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=1).count()
+
+                ticket_close = Ticket.objects.filter(office_id=user_office,
+                                                     assigned_to=request.user.id,
+                                                     status=3).count()
+
+                ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                        assigned_to=request.user.id,
+                                                        status=2).count()
+
+                ticket_list = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=2).order_by('-id')
+
+                paginator = Paginator(ticket_list, 5)
+                next_ticket_no = Ticket.objects.latest('id').id + 1
+
+                page_number = request.GET.get('page')
+                tickets = paginator.get_page(page_number)
+                nums = 'a' * tickets.paginator.num_pages
+                return render(request, 'cssurvey/helpdesk/helpdesk.html', {'user_group': user_group,
+                                                                           'tickets': tickets,
+                                                                           'nums': nums,
+                                                                           'searched': False,
+                                                                           'next_ticket': next_ticket_no,
+                                                                           'create_ticket': CreateTicketForm,
+                                                                           'user_office': user_office,
+                                                                           'ticket_open': ticket_open,
+                                                                           'ticket_close': ticket_close,
+                                                                           'ticket_declined': ticket_declined, })
+            except ValueError:
+                messages.error(request, 'Error loading the page. Please try again')
+                return redirect('help_desk')

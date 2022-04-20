@@ -87,14 +87,16 @@
                                     <input class="form-control" id="email" type="email" name="email" placeholder="Enter your email address" value="{{ profile.email }}"/>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="small mb-1" for="id_office_id">Office</label>
-<!--                                <input class="form-control" id="office_id" type="text" placeholder="Enter your office name" value="{{ profile_details.office_id }}"/>-->
-<!--                                <select class="form-control" id="id_office_id" name="id_office_id">-->
-<!--                                    <option value="profile_details.office_id">{{ profile_details.office_id }}</option>-->
-<!--                                </select>-->
-                                {{ form_profile.office_id }}
-                            </div>
+                            {% if not own %}
+                                <div class="form-group">
+                                    <label class="small mb-1" for="id_office_id">Office</label>
+    <!--                                <input class="form-control" id="office_id" type="text" placeholder="Enter your office name" value="{{ profile_details.office_id }}"/>-->
+    <!--                                <select class="form-control" id="id_office_id" name="id_office_id">-->
+    <!--                                    <option value="profile_details.office_id">{{ profile_details.office_id }}</option>-->
+    <!--                                </select>-->
+                                    {{ form_profile.office_id }}
+                                </div>
+                            {% endif %}
                             <br>
                             <br>
                             <!-- Save changes button-->

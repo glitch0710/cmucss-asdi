@@ -83,7 +83,7 @@
                             </div>
                         </h6>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#!">
+                        <a class="dropdown-item" href="{% url 'my_account' %}">
                             <div class="dropdown-item-icon"><i data-feather="settings"></i></div>
                             Account
                         </a>
@@ -158,6 +158,22 @@
                               <a class="nav-link" href="{% url 'help_desk' %}">
                                   <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
                                   User Dashboard
+                              </a>
+                              <div class="sidenav-menu-heading">Tickets</div>
+                              <a class="nav-link" href="{% url 'active_ticket' %}">
+                                  <div class="nav-link-icon"><i data-feather="file-text"></i></div>
+                                  Active Tickets
+                                  <span class="badge badge-primary-soft text-primary ml-auto">{{ ticket_open }}</span>
+                              </a>
+                              <a class="nav-link" href="{% url 'closed_ticket' %}">
+                                  <div class="nav-link-icon"><i data-feather="archive"></i></div>
+                                  Closed Tickets
+                                  <span class="badge badge-primary-soft text-primary ml-auto">{{ ticket_close }}</span>
+                              </a>
+                              <a class="nav-link" href="{% url 'declined_ticket' %}">
+                                  <div class="nav-link-icon"><i data-feather="x-circle"></i></div>
+                                  Declined Tickets
+                                  <span class="badge badge-primary-soft text-primary ml-auto">{{ ticket_declined }}</span>
                               </a>
                           {% endif %}
 

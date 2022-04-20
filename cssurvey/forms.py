@@ -1,5 +1,5 @@
 from django.forms import ModelForm, Select, Textarea, TextInput, CheckboxInput
-from .models import TbCssrespondents, TbCssrespondentsDetails, TbQuestions, TbEmployees, TbCmuoffices
+from .models import TbCssrespondents, TbCssrespondentsDetails, TbQuestions, TbEmployees, TbCmuoffices, Ticket
 from django.contrib.auth.models import User
 
 
@@ -93,3 +93,49 @@ class TbCmuOfficesAddForm(ModelForm):
                 'name': "officecode",
             }),
         }
+
+
+class CreateTicketForm(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['name','email','title','complaint',]
+        widgets = {
+            'ticket_no': TextInput(attrs={
+                'class': "form-control",
+                # 'id': "ticketno",
+                # 'name': "ticketno",
+            }),
+            'title': TextInput(attrs={
+                'class': "form-control",
+                # 'id': "title",
+                # 'name': "title",
+                'placeholder': "Enter subject",
+            }),
+            'name': TextInput(attrs={
+                'class': "form-control",
+                # 'id': "name",
+                # 'name': "name",
+                'placeholder': "Enter name of client (optional)",
+            }),
+            'email': TextInput(attrs={
+                'class': "form-control",
+                # 'id': "email",
+                # 'name': "email",
+                'type': "email",
+                'placeholder': "Enter email of client",
+                'required': True,
+            }),
+            'complaint': Textarea(attrs={
+                'class': "form-control",
+                # 'id': "complaint",
+                # 'name': "complaint",
+                'placeholder': "Enter client's concern",
+                'required': True,
+            })
+        }
+
+
+class UpdateTicketForm(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['ticket_no','name','email','title','complaint','status',]

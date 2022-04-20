@@ -122,6 +122,17 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 
+class GeneratedLinks(models.Model):
+    ticket_id = models.IntegerField(blank=True, null=True)
+    token = models.CharField(max_length=255, blank=True, null=True)
+    generated_link = models.CharField(max_length=255, blank=True, null=True)
+    respondentid = models.IntegerField(db_column='respondentID', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'generated_links'
+
+
 class TbCmuoffices(models.Model):
     officeid = models.AutoField(db_column='officeID', primary_key=True)  # Field name made lowercase.
     officename = models.TextField(db_column='officeName', blank=True, null=True)  # Field name made lowercase.

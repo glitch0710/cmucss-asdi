@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails, TbEmployees, Ticket
+from .models import TbQuestions, TbCoverage, TbCmuoffices, TbCssrespondentsDetails, TbEmployees, Ticket, GeneratedLinks
 from .forms import TbCssrespondentsForm, TbCssrespondentsDetailsForm, TbCssrespondents, TbQuestionsForm, TbEmployeesForm, UserChangeUpdateForm, UserProfileUpdateForm, TbCmuOfficesForm, TbCmuOfficesAddForm, CreateTicketForm
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
@@ -10,7 +10,10 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.core.paginator import Paginator
+from django.core import signing
+from django.core.signing import Signer, BadSignature
 import datetime
+import random
 
 
 def page_not_found_view(request, exception):
@@ -62,20 +65,36 @@ def index(request):
 
 def customersurvey(request):
     questions = TbQuestions.objects.filter(display_status=1)
+    signer = Signer()
 
     if request.method == 'GET':
-        if request.GET.get('office'):
-            # implement this when finished with link generation for css
-            officeno = request.GET.get('office')
-        else:
-            # default for now
-            officeno = 35
+        try:
+            if request.GET.get('office'):
+                # implement this when finished with link generation for css
+                officeno = signer.unsign_object(request.GET.get('office'))
+                officeno_original = officeno['office']
+            else:
+                # default for now
+                return HttpResponse('no office targeted')
 
-        officename = TbCmuoffices.objects.get(officeid=officeno)
-        return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
-                                                                'office': officename,
-                                                                'form': TbCssrespondentsForm,
-                                                                'form1': TbCssrespondentsDetailsForm})
+            if request.GET.get('token'):
+                token = signer.unsign_object(request.GET.get('token'))
+                token_original = token['token']
+
+                scan_ticket = get_object_or_404(GeneratedLinks, token=token_original)
+
+                if scan_ticket.status == 1:
+                    return HttpResponse('Done evaluate')
+            else:
+                return HttpResponse('no token')
+
+            officename = TbCmuoffices.objects.get(officeid=officeno_original)
+            return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
+                                                                    'office': officename,
+                                                                    'form': TbCssrespondentsForm,
+                                                                    'form1': TbCssrespondentsDetailsForm})
+        except signing.BadSignature:
+            return HttpResponse('The token has been tampered. Please try again.')
     else:
         try:
             if request.GET.get('office'):
@@ -636,32 +655,69 @@ def view_ticket(request, ticket_id):
 @login_required
 def close_ticket(request, ticket_id):
     if request.method == 'POST':
-        user_group = request.user.groups.all()[0].id
-        user_office = TbEmployees.objects.get(user=request.user.id).office_id
+        try:
+            user_group = request.user.groups.all()[0].id
+            user_office = TbEmployees.objects.get(user=request.user.id).office_id
 
-        ticket_close = get_object_or_404(Ticket, pk=ticket_id, assigned_to=request.user.id)
-        ticket_close.status = 3
-        ticket_close.closed_by = User.objects.get(username=request.user)
-        ticket_close.closed_date = datetime.datetime.now()
-        ticket_close.save()
+            ticket_close = get_object_or_404(Ticket, pk=ticket_id, assigned_to=request.user.id)
+            ticket_close.status = 3
+            ticket_close.closed_by = User.objects.get(username=request.user)
+            ticket_close.closed_date = datetime.datetime.now()
+            ticket_close.save()
 
-        ticket_open = Ticket.objects.filter(office_id=user_office,
-                                            assigned_to=request.user.id,
-                                            status=1).count()
+            # resume here
+            characters = list("abcdefghijklmnopqrstuvwxyz")
+            characters.extend(list("ABCDEFHIJKLMNOPQRSTUVWXYZ"))
+            characters.extend(list("1234567890"))
+            generate_random = 8
+            random_token = ''
 
-        ticket_closed = Ticket.objects.filter(office_id=user_office,
-                                              assigned_to=request.user.id,
-                                              status=3).count()
+            for x in range(generate_random):
+                random_token += random.choice(characters)
 
-        ticket_declined = Ticket.objects.filter(office_id=user_office,
+            office = TbCmuoffices.objects.get(officename=user_office).officeid
+
+            signer = Signer()
+            en_office = signer.sign_object({'office': str(office)})
+            en_token = signer.sign_object({'token': random_token})
+
+            gen_link = 'http://localhost:8000/css/?office=' + en_office + '&token=' + en_token
+            latest_ticket = ticket_close.id
+
+            check_if_exists = GeneratedLinks.objects.filter(ticket_id=latest_ticket)
+
+            if check_if_exists.count() == 0:
+                GeneratedLinks.objects.create(ticket_id=Ticket.objects.get(id=latest_ticket),
+                                              token=random_token,
+                                              generated_link=gen_link)
+            else:
+                messages.error(request, 'Ticket has been closed and has a generated link already.')
+                return redirect('view_ticket', ticket_id=ticket_id)
+
+            ticket_open = Ticket.objects.filter(office_id=user_office,
                                                 assigned_to=request.user.id,
-                                                status=2).count()
+                                                status=1).count()
 
-        return render(request, 'cssurvey/helpdesk/generatelink.html', {'user_group': user_group,
-                                                                       'ticket': ticket_close,
-                                                                       'ticket_open': ticket_open,
-                                                                       'ticket_close': ticket_closed,
-                                                                       'ticket_declined': ticket_declined,})
+            ticket_closed = Ticket.objects.filter(office_id=user_office,
+                                                  assigned_to=request.user.id,
+                                                  status=3).count()
+
+            ticket_declined = Ticket.objects.filter(office_id=user_office,
+                                                    assigned_to=request.user.id,
+                                                    status=2).count()
+
+            return render(request, 'cssurvey/helpdesk/generatelink.html', {'user_group': user_group,
+                                                                           'ticket': ticket_close,
+                                                                           'ticket_open': ticket_open,
+                                                                           'ticket_close': ticket_closed,
+                                                                           'ticket_declined': ticket_declined,
+                                                                           'gen_link': gen_link,})
+        except ValueError:
+            messages.error(request, 'Something went wrong. Please contact system administrator')
+            return redirect('help_desk')
+        except AttributeError:
+            messages.error(request, 'Something went wrong. Please contact system administrator')
+            return redirect('help_desk')
     else:
         messages.error(request, 'Bad request')
         return redirect('help_desk')

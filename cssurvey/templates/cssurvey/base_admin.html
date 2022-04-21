@@ -237,6 +237,15 @@
                 </footer>
             </div>
         </div>
+        <script type="javascript">
+            function copyToClipboard(element) {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(element).text()).select();
+                document.execCommand("copy");
+                $temp.remove();
+            }
+        </script>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="{% static 'js1/scripts.js' %}"></script>

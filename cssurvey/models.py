@@ -54,7 +54,7 @@ class TbCssrespondents(models.Model):
     respondentname = models.TextField(db_column='respondentName', blank=True, null=True)  # Field name made lowercase.
     respondenttype = models.TextField(db_column='respondentType', blank=True, null=True)  # Field name made lowercase.
     responddate = models.DateField(db_column='respondDate', blank=True, null=True, auto_now_add=True)  # Field name made lowercase.
-    employee_id = models.IntegerField(blank=True, null=True)
+    employee_id = models.ForeignKey(User, models.DO_NOTHING, db_column='employee_id')
     coverageid = models.ForeignKey(TbCoverage, models.DO_NOTHING, db_column='coverageID', blank=True, null=True)  # Field name made lowercase.
     respondedofficeid = models.ForeignKey(TbCmuoffices, models.DO_NOTHING, db_column='respondedOfficeID', blank=True, null=True)  # Field name made lowercase.
     comments = models.TextField(blank=True, null=True)
@@ -138,6 +138,9 @@ class Ticket(models.Model):
     closed_by = models.ForeignKey(User, models.DO_NOTHING, related_name='closed_by', db_column='closed_by')
     closed_date = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        return self.ticket_no
+
     class Meta:
         managed = False
         db_table = 'ticket'
@@ -149,6 +152,10 @@ class GeneratedLinks(models.Model):
     generated_link = models.CharField(max_length=255, blank=True, null=True)
     respondentid = models.ForeignKey('TbCssrespondents',models.DO_NOTHING, db_column='respondentid')
     status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.ticket_id
+
 
     class Meta:
         managed = False

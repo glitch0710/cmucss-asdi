@@ -41,9 +41,9 @@
                                 {% if ticket.status == 1 %}
                                     <div class="h5"><span class="badge badge-warning-soft text-warning font-weight-normal">Open - Awaiting Response</span></div>
                                 {% elif ticket.status == 2 %}
-                                    <div class="h5"><span class="badge badge-danger-soft text-danger font-weight-normal">Declined</span></div>
+                                    <div class="h5"><span class="badge badge-danger-soft text-danger font-weight-normal">Declined ({{ ticket.closed_date|date:'l, F d Y' }})</span></div>
                                 {% elif ticket.status == 3 %}
-                                    <div class="h5"><span class="badge badge-success-soft text-success font-weight-normal">Closed - Marked as resolved</span></div>
+                                    <div class="h5"><span class="badge badge-success-soft text-success font-weight-normal">Closed - Marked as resolved ({{ ticket.closed_date|date:'l, F d Y' }})</span></div>
                                 {% endif %}
                             </div>
                             <hr class="mb-4" />

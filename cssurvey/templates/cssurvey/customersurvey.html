@@ -5,20 +5,7 @@
 <h1>{{ office }}</h1>
 <p class="lead">Online Customer Satisfaction Survey</p>
 <hr class="my-5" />
-{% if error %}
-<div class="alert alert-danger alert-icon" role="alert">
-    <button class="close" type="button" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">×</span>
-    </button>
-    <div class="alert-icon-aside">
-        <i data-feather="alert-triangle"></i>
-    </div>
-    <div class="alert-icon-content">
-        <h6 class="alert-heading">Error</h6>
-        {{ error }}
-    </div>
-</div>
-{% endif %}
+{% include 'cssurvey/messages.html' %}
 <form action="" method="POST">
     {% csrf_token %}
     <div class="card shadow">
@@ -78,6 +65,8 @@
                 </div>
             {% endfor %}
             <br><br><br>
+            <input type="hidden" name="token" value="{{ token }}">
+            <input type="hidden" name="officeno" value="{{ officeno }}">
             <div class="form-group"><label for="comments">Comments and Suggestions <span class="badge badge-info">optional</span></label><textarea class="form-control form-control-solid" id="comments" name="comments" rows="5" placeholder="Enter your comments and suggestions here"></textarea></div>
             <br><br><br>
             <button class="btn font-weight-500 btn-teal" type="submit">Submit<i class="ml-2" data-feather="arrow-right"></i></button>

@@ -34,15 +34,17 @@
                             <h6>Closed</h6>
                             <p class="card-text">Ticket #{{ ticket.id }} has been closed</p>
                             <div class="badge badge-pill badge-success font-weight-normal px-3 py-2">Click link below to copy generated link</div>
-                            <input type="hidden" value="{{ gen_link }}" id="genlink">
                             <p id="genlinks" style="display: none;">{{ gen_link }}</p>
                             <br>
                             <button class="btn btn-link btn-sm" type="button" onclick="copyToClipboard('#genlinks')">Generated Link</button>
                         </div>
+                        <div class="bg-transparent font-weight-normal pt-0 pb-5 text-center">The client was sent an email containing the one-time link above for the Customer Satisfaction Survey. But if you want to manually send the link to the client, please click the 'generated link' button above to copy the link</div>
+                        <div class="text-center">
+                            <a class="btn btn-link" type="button" href="{% url 'help_desk' %}">Go back to User Dashboard</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer bg-transparent pt-0 pb-5 text-center"><div class="badge badge-pill badge-light font-weight-normal px-3 py-2">The client will be sent an email containing the one-time link above for the Customer Satisfaction Survey.</div></div>
         </div>
     </div>
 </main>

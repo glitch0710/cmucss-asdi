@@ -8,9 +8,6 @@ class TbCssrespondentsForm(ModelForm):
         model = TbCssrespondents
         fields = ['respondentname',
                   'respondenttype',
-                  'employee_id',
-                  'coverageid',
-                  'respondedofficeid',
                   'comments',]
 
 

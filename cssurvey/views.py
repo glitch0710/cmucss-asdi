@@ -11,7 +11,8 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.core import signing
-from django.core.signing import Signer, BadSignature
+from django.core.signing import Signer
+from django.core.mail import send_mail
 import datetime
 import random
 
@@ -92,32 +93,27 @@ def customersurvey(request):
             return render(request, 'cssurvey/customersurvey.html', {'questions': questions,
                                                                     'office': officename,
                                                                     'form': TbCssrespondentsForm,
-                                                                    'form1': TbCssrespondentsDetailsForm})
+                                                                    'form1': TbCssrespondentsDetailsForm,
+                                                                    'token': token_original,
+                                                                    'officeno': officeno_original,})
         except signing.BadSignature:
             return HttpResponse('The token has been tampered. Please try again.')
     else:
         try:
-            if request.GET.get('office'):
-                # implement this when finished with link generation for css
-                officeno = request.GET.get('office')
-            else:
-                # default for now
-                officeno = 35
+            officeno = request.POST.get('officeno')
+            token = request.POST.get('token')
 
-            if request.GET.get('employee'):
-                # implement this when finished with link generation for css
-                employee = request.GET.get('employee')
-            else:
-                # default for now
-                employee = 0
+            ticketno = GeneratedLinks.objects.values_list('ticket_id', flat=True).get(token=token)
+            employee = Ticket.objects.get(id=ticketno).closed_by
 
             form = TbCssrespondentsForm(request.POST)
-            newcss = form.save(commit=False)
+            if form.is_valid():
+                newcss = form.save(commit=False)
 
-            newcss.employee_id = employee
-            newcss.coverageid = TbCoverage.objects.latest('coverageid')
-            newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=officeno)
-            newcss.save()
+                newcss.employee_id = employee
+                newcss.coverageid = TbCoverage.objects.latest('coverageid')
+                newcss.respondedofficeid = TbCmuoffices.objects.get(officeid=officeno)
+                newcss.save()
 
             # get last id inserted
             last_id = newcss.respondentid
@@ -134,14 +130,20 @@ def customersurvey(request):
                                                        respondentid=TbCssrespondents.objects.get(respondentid=last_id),
                                                        rating=rate)
 
+            update_genlink = GeneratedLinks.objects.get(token=token)
+            update_genlink.status = 1
+            update_genlink.save()
+
             return redirect('submitcss')
         except ValueError:
-            TbCssrespondents.objects.filter(respondentid=last_id).delete()
-            return render(
-                request,
-                'cssurvey/customersurvey.html',
-                {'questions': questions, 'form': TbCssrespondentsForm, 'error': 'Bad data passed in. Please try again!'}
-            )
+            # TbCssrespondents.objects.filter(respondentid=last_id).delete()
+            # return render(
+            # request,
+            # 'cssurvey/customersurvey.html',
+            # {'questions': questions, 'form': TbCssrespondentsForm, 'error': 'Bad data passed in. Please try again!'}
+            # )
+            messages.error(request, 'Bad data passed in. Please try again!')
+            return render('customersurvey')
 
 
 def submitcss(request):
@@ -693,6 +695,13 @@ def close_ticket(request, ticket_id):
             else:
                 messages.error(request, 'Ticket has been closed and has a generated link already.')
                 return redirect('view_ticket', ticket_id=ticket_id)
+
+            send_mail(
+                ticket_close.title + ' - Ticket #' + ticket_close.ticket_no,
+                'Here is the link: ' + gen_link,
+                'cmu.css@cmu.edu.ph',
+                ['rhandoy@cmu.edu.ph'],
+            )
 
             ticket_open = Ticket.objects.filter(office_id=user_office,
                                                 assigned_to=request.user.id,

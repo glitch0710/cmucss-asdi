@@ -2,7 +2,7 @@
 
 {% block title %} Help Desk Online {% endblock %}
 
-{% block page_title %} Help Desk {% endblock %}
+{% block page_title %} <a class="navbar-brand" href="{% url 'help_desk' %}">Help Desk</a> {% endblock %}
 
 {% block content %}
 
@@ -48,6 +48,19 @@
                             </div>
                             <hr class="mb-4" />
                             {% include 'cssurvey/messages.html' %}
+                            {% if ticket.status == 3 %}
+                                <div class="alert alert-success alert-icon d-flex justify-content-between" role="alert">
+                                    <div class="alert-icon-content">
+                                        <h6 class="alert-heading">Generated Link</h6>
+                                        <p id="genlinks" style="display: none;">{{ generated_link.generated_link }}</p>
+                                        Click the button to copy the generated link for the closed ticket
+                                    </div>
+                                    <button class="btn btn-outline-success" type="button" onclick="copyToClipboard('#genlinks')" tabindex="0" data-trigger="focus" title="" data-container="body" data-toggle="popover" data-placement="top" data-content="copied!">
+                                        <i class="fas fa-link mr-2"></i>
+                                        Copy Link
+                                    </button>
+                                </div>
+                            {% endif %}
                             <div class="card mb-5">
                                 <div class="card-header d-flex justify-content-between">
                                     <div class="mr-2 text-dark">

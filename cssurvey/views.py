@@ -44,7 +44,7 @@ def loginuser(request):
                 if request.user.groups.all()[0].id == 1:
                     return redirect('controlpanel')
                 elif request.user.groups.all()[0].id == 2:
-                    return HttpResponse('office admin')
+                    return redirect('office_admin')
                 elif request.user.groups.all()[0].id == 3:
                     return redirect('help_desk')
 
@@ -876,3 +876,15 @@ def declined_ticket(request):
         except ValueError:
             messages.error(request, 'Error loading the page. Please try again')
             return redirect('help_desk')
+
+
+@login_required
+def office_admin(request):
+    if request.method == 'GET':
+        user_group = request.user.groups.all()[0].id
+        user_office = TbEmployees.objects.get(user=request.user.id)
+
+        return render(request, 'cssurvey/monitoring/officeadmin.html', {'user_group': user_group,
+                                                                        'user_office': user_office,})
+    else:
+        pass

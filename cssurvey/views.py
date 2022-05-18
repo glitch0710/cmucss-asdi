@@ -17,6 +17,7 @@ from django.template.loader import get_template
 from django.conf import settings
 import datetime
 import random
+import json
 
 
 def page_not_found_view(request, exception):
@@ -161,7 +162,7 @@ def submitcss(request):
     return render(request, 'cssurvey/submitcss.html')
 
 
-@login_required
+@login_required(login_url='/login')
 def controlpanel(request):
     user_group = request.user.groups.all()[0].id
     if user_group != 1:
@@ -170,7 +171,7 @@ def controlpanel(request):
         return render(request, 'cssurvey/controlpanel.html', {'user_group': user_group})
 
 
-@login_required
+@login_required(login_url='/login')
 def questions(request):
     user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
@@ -191,7 +192,7 @@ def questions(request):
                                                            'user_group': user_group})
 
 
-@login_required
+@login_required(login_url='/login')
 def viewquestion(request, question_pk):
     user_group = request.user.groups.all()[0].id
     question = get_object_or_404(TbQuestions, pk=question_pk)
@@ -214,7 +215,7 @@ def viewquestion(request, question_pk):
             return redirect('viewquestion', question_pk=question_pk)
 
 
-@login_required
+@login_required(login_url='/login')
 def create_question(request):
     user_group = request.user.groups.all()[0].id
     if request.method == 'POST':
@@ -237,7 +238,7 @@ def create_question(request):
             return redirect('questions')
 
 
-@login_required
+@login_required(login_url='/login')
 def delete_question(request, question_pk):
     user_group = request.user.groups.all()[0].id
     del_question = get_object_or_404(TbQuestions, pk=question_pk)
@@ -254,9 +255,13 @@ def delete_question(request, question_pk):
         return redirect('questions')
 
 
-@login_required
+@login_required(login_url='/login')
 def user_accounts(request):
     user_group = request.user.groups.all()[0].id
+
+    if user_group != 1:
+        return render(request, 'cssurvey/unauthorized.html')
+
     form_profile = TbEmployeesForm()
     userid = request.user.id
     if request.method == 'GET':
@@ -304,7 +309,7 @@ def user_accounts(request):
             return redirect('user_accounts')
 
 
-@login_required
+@login_required(login_url='/login')
 def my_account(request):
     user_group = request.user.groups.all()[0].id
     my_acc = get_object_or_404(User, pk=request.user.id)
@@ -350,7 +355,7 @@ def my_account(request):
             return redirect('my_account')
 
 
-@login_required
+@login_required(login_url='/login')
 def my_password(request):
     # change password for user
     user_group = request.user.groups.all()[0].id
@@ -373,7 +378,7 @@ def my_password(request):
             return redirect('my_password')
 
 
-@login_required
+@login_required(login_url='/login')
 def view_user(request, user_pk):
     user_group = request.user.groups.all()[0].id
     user_details = get_object_or_404(User, pk=user_pk)
@@ -409,7 +414,7 @@ def view_user(request, user_pk):
             return redirect('view_user', user_pk=user_pk)
 
 
-@login_required
+@login_required(login_url='/login')
 def change_password(request, user_pk):
     user_group = request.user.groups.all()[0].id
     user_details = get_object_or_404(User, pk=user_pk)
@@ -436,7 +441,7 @@ def change_password(request, user_pk):
             return redirect('change_password', user_pk=user_pk)
 
 
-@login_required
+@login_required(login_url='/login')
 def deactivate_user(request, user_pk):
     if request.method == 'POST':
         deactivate = get_object_or_404(User, pk=user_pk)
@@ -449,7 +454,7 @@ def deactivate_user(request, user_pk):
         return redirect('user_accounts')
 
 
-@login_required
+@login_required(login_url='/login')
 def reactivate_user(request, user_pk):
     if request.method == 'POST':
         reactivate = get_object_or_404(User, pk=user_pk)
@@ -462,7 +467,7 @@ def reactivate_user(request, user_pk):
         return redirect('user_accounts')
 
 
-@login_required
+@login_required(login_url='/login')
 def offices(request):
     user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
@@ -486,7 +491,7 @@ def offices(request):
             return redirect('offices')
 
 
-@login_required
+@login_required(login_url='/login')
 def view_office(request, office_pk):
     user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
@@ -512,7 +517,7 @@ def view_office(request, office_pk):
             return redirect('view_office', office_pk=office.officeid)
 
 
-@login_required
+@login_required(login_url='/login')
 def office_staff(request, office_pk):
     user_group = request.user.groups.all()[0].id
     if request.method == 'GET':
@@ -525,14 +530,18 @@ def office_staff(request, office_pk):
         pass
 
 
-def ticket_counter(user_office, assigned, status):
-    ticket_open = Ticket.objects.filter(office_id=user_office,
-                                        assigned_to=assigned,
-                                        status=status).count()
+def ticket_counter(user_office, assigned, status, request=1):
+    if request == 0:
+        ticket_open = Ticket.objects.filter(office_id=user_office,
+                                            status=status).count()
+    else:
+        ticket_open = Ticket.objects.filter(office_id=user_office,
+                                            assigned_to=assigned,
+                                            status=status).count()
     return ticket_open
 
 
-@login_required
+@login_required(login_url='/login')
 def help_desk(request):
     if request.method == 'GET':
         try:
@@ -592,7 +601,7 @@ def help_desk(request):
                                                                    'ticket_declined': ticket_declined,})
 
 
-@login_required
+@login_required(login_url='/login')
 def create_ticket(request):
     if request.method == 'POST':
         try:
@@ -620,7 +629,7 @@ def create_ticket(request):
             return redirect('help_desk')
 
 
-@login_required
+@login_required(login_url='/login')
 def view_ticket(request, ticket_id):
     try:
         user_group = request.user.groups.all()[0].id
@@ -654,7 +663,7 @@ def view_ticket(request, ticket_id):
         return redirect('view_ticket')
 
 
-@login_required
+@login_required(login_url='/login')
 def close_ticket(request, ticket_id):
     if request.method == 'POST':
         try:
@@ -749,7 +758,7 @@ def send_email_from_app(link, ticket, client, title):
     email_msg.send(fail_silently=False)
 
 
-@login_required
+@login_required(login_url='/login')
 def decline_ticket(request, ticket_id):
     if request.method == 'POST':
         try:
@@ -769,7 +778,7 @@ def decline_ticket(request, ticket_id):
         return redirect('help_desk')
 
 
-@login_required
+@login_required(login_url='/login')
 def active_ticket(request):
     if request.method == 'GET':
         try:
@@ -805,7 +814,7 @@ def active_ticket(request):
             return redirect('help_desk')
 
 
-@login_required
+@login_required(login_url='/login')
 def closed_ticket(request):
     if request.method == 'GET':
         if request.method == 'GET':
@@ -842,7 +851,7 @@ def closed_ticket(request):
                 return redirect('help_desk')
 
 
-@login_required
+@login_required(login_url='/login')
 def declined_ticket(request):
     if request.method == 'GET':
         try:
@@ -878,13 +887,30 @@ def declined_ticket(request):
             return redirect('help_desk')
 
 
-@login_required
+@login_required(login_url='/login')
 def office_admin(request):
     if request.method == 'GET':
         user_group = request.user.groups.all()[0].id
         user_office = TbEmployees.objects.get(user=request.user.id)
+        user_office_id = TbEmployees.objects.get(user=request.user.id).office_id
+
+        opentick = ticket_counter(user_office_id, request.user.id, 1, 0)
+        closetick = ticket_counter(user_office_id, request.user.id, 3, 0)
+        dectick = ticket_counter(user_office_id, request.user.id, 2, 0)
+        unread = Ticket.objects.filter(is_read=0, office_id=user_office_id).count()
+
+        labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        data = [180, 51, 200, 100, 10, 1, 231, 212, 1000, 1402, 200, 41]
+        data1 = [1, 2, 3, 4, 5, 1, 100, 150, 500, 302, 200, 20]
 
         return render(request, 'cssurvey/monitoring/officeadmin.html', {'user_group': user_group,
-                                                                        'user_office': user_office,})
+                                                                        'user_office': user_office,
+                                                                        'open': opentick,
+                                                                        'close': closetick,
+                                                                        'decline': dectick,
+                                                                        'unread': unread,
+                                                                        'labels': json.dumps(labels),
+                                                                        'data': json.dumps(data),
+                                                                        'data1': json.dumps(data1)})
     else:
         pass

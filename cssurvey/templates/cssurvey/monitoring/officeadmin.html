@@ -25,7 +25,7 @@
     <!-- Main page content-->
     <div class="container mt-n10">
         <div class="row">
-            <div class="col-xxl-6 col-xl-6 mb-4">
+            <div class="col-xxl-12 col-xl-12 mb-4">
                 <div class="card h-100">
                     <div class="card-body h-100 d-flex flex-column justify-content-center py-5 py-xl-4">
                         <div class="row align-items-center">
@@ -40,75 +40,18 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xxl-6 col-xl-6 mb-4">
-                <div class="card card-header-actions h-100">
-                    <div class="card-header">
-                        Progress Tracker
-                        <div class="dropdown no-caret">
-                            <button class="btn btn-transparent-dark btn-icon dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="text-gray-500" data-feather="more-vertical"></i></button>
-                            <div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#!">
-                                    <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="list"></i></div>
-                                    Manage Tasks
-                                </a>
-                                <a class="dropdown-item" href="#!">
-                                    <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="plus-circle"></i></div>
-                                    Add New Task
-                                </a>
-                                <a class="dropdown-item" href="#!">
-                                    <div class="dropdown-item-icon"><i class="text-gray-500" data-feather="minus-circle"></i></div>
-                                    Delete Tasks
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h4 class="small">
-                            Server Migration
-                            <span class="float-right font-weight-bold">20%</span>
-                        </h4>
-                        <div class="progress mb-4"><div class="progress-bar bg-danger" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div></div>
-                        <h4 class="small">
-                            Sales Tracking
-                            <span class="float-right font-weight-bold">40%</span>
-                        </h4>
-                        <div class="progress mb-4"><div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div></div>
-                        <h4 class="small">
-                            Customer Database
-                            <span class="float-right font-weight-bold">60%</span>
-                        </h4>
-                        <div class="progress mb-4"><div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div></div>
-                        <h4 class="small">
-                            Payout Details
-                            <span class="float-right font-weight-bold">80%</span>
-                        </h4>
-                        <div class="progress mb-4"><div class="progress-bar bg-info" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div></div>
-                        <h4 class="small">
-                            Account Setup
-                            <span class="float-right font-weight-bold">Complete!</span>
-                        </h4>
-                        <div class="progress"><div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div></div>
-                    </div>
-                    <a class="card-footer" href="#!">
-                        <div class="d-flex align-items-center justify-content-between small text-body">
-                            Visit Task Center
-                            <i data-feather="arrow-right"></i>
-                        </div>
-                    </a>
-                </div>
-            </div>
         </div>
-        <!-- Example Colored Cards for Dashboard Demo-->
+        <!-- Tickets-->
         <div class="row">
             <div class="col-xxl-3 col-lg-6">
                 <div class="card bg-primary text-white mb-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="mr-3">
-                                <div class="text-white-75 small">Earnings (Monthly)</div>
-                                <div class="text-lg font-weight-bold">$40,000</div>
+                                <div class="text-white-75 small">Unread Tickets</div>
+                                <div class="text-lg font-weight-bold">{{ unread }}</div>
                             </div>
-                            <i class="feather-xl text-white-50" data-feather="calendar"></i>
+                            <i class="feather-xl text-white-50" data-feather="mail"></i>
                         </div>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
@@ -122,10 +65,10 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="mr-3">
-                                <div class="text-white-75 small">Earnings (Annual)</div>
-                                <div class="text-lg font-weight-bold">$215,000</div>
+                                <div class="text-white-75 small">Open Tickets</div>
+                                <div class="text-lg font-weight-bold">{{ open }}</div>
                             </div>
-                            <i class="feather-xl text-white-50" data-feather="dollar-sign"></i>
+                            <i class="feather-xl text-white-50" data-feather="file-text"></i>
                         </div>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
@@ -139,10 +82,10 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="mr-3">
-                                <div class="text-white-75 small">Task Completion</div>
-                                <div class="text-lg font-weight-bold">24</div>
+                                <div class="text-white-75 small">Closed Tickets</div>
+                                <div class="text-lg font-weight-bold">{{ close }}</div>
                             </div>
-                            <i class="feather-xl text-white-50" data-feather="check-square"></i>
+                            <i class="feather-xl text-white-50" data-feather="check-circle"></i>
                         </div>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
@@ -156,10 +99,10 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="mr-3">
-                                <div class="text-white-75 small">Pending Requests</div>
-                                <div class="text-lg font-weight-bold">17</div>
+                                <div class="text-white-75 small">Declined Tickets</div>
+                                <div class="text-lg font-weight-bold">{{ decline }}</div>
                             </div>
-                            <i class="feather-xl text-white-50" data-feather="message-circle"></i>
+                            <i class="feather-xl text-white-50" data-feather="x-circle"></i>
                         </div>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
@@ -169,52 +112,132 @@
                 </div>
             </div>
         </div>
-        <!-- Example Charts for Dashboard Demo-->
+        <!-- Charts-->
         <div class="row">
-            <div class="col-xl-6 mb-4">
+            <div class="col-xl-12 mb-4">
                 <div class="card card-header-actions h-100">
                     <div class="card-header">
-                        Earnings Breakdown
-                        <div class="dropdown no-caret">
-                            <button class="btn btn-transparent-dark btn-icon dropdown-toggle" id="areaChartDropdownExample" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="text-gray-500" data-feather="more-vertical"></i></button>
-                            <div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="areaChartDropdownExample">
-                                <a class="dropdown-item" href="#!">Last 12 Months</a>
-                                <a class="dropdown-item" href="#!">Last 30 Days</a>
-                                <a class="dropdown-item" href="#!">Last 7 Days</a>
-                                <a class="dropdown-item" href="#!">This Month</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#!">Custom Range</a>
-                            </div>
-                        </div>
+                        Performance Levels (Overall Tickets/Tickets Completed)
                     </div>
                     <div class="card-body">
                         <div class="chart-area"><canvas id="myAreaChart" width="100%" height="30"></canvas></div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-6 mb-4">
-                <div class="card card-header-actions h-100">
-                    <div class="card-header">
-                        Monthly Revenue
-                        <div class="dropdown no-caret">
-                            <button class="btn btn-transparent-dark btn-icon dropdown-toggle" id="areaChartDropdownExample" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="text-gray-500" data-feather="more-vertical"></i></button>
-                            <div class="dropdown-menu dropdown-menu-right animated--fade-in-up" aria-labelledby="areaChartDropdownExample">
-                                <a class="dropdown-item" href="#!">Last 12 Months</a>
-                                <a class="dropdown-item" href="#!">Last 30 Days</a>
-                                <a class="dropdown-item" href="#!">Last 7 Days</a>
-                                <a class="dropdown-item" href="#!">This Month</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#!">Custom Range</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-bar"><canvas id="myBarChart" width="100%" height="30"></canvas></div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </main>
+
+{% endblock %}
+
+{% block chart_js %}
+<script language="JavaScript">
+    // Area Chart Example
+    var ctx = document.getElementById("myAreaChart");
+    var myLineChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [
+                {
+                    label: "Overall Tickets",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(0, 97, 242, 0.05)",
+                    borderColor: "rgba(0, 97, 242, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(0, 97, 242, 1)",
+                    pointBorderColor: "rgba(0, 97, 242, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(0, 97, 242, 1)",
+                    pointHoverBorderColor: "rgba(0, 97, 242, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: {{ data|safe }}
+                },{
+                    label: "Tickets Completed",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(83, 196, 77, 0.4)",
+                    borderColor: "rgba(83, 196, 77, 0.8)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(83, 196, 77, 0.8)",
+                    pointBorderColor: "rgba(83, 196, 77, 0.8)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(83, 196, 77, 0.8",
+                    pointHoverBorderColor: "rgba(83, 196, 77, 0.8",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: {{ data1|safe }}
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    time: {
+                        unit: "date"
+                    },
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 7
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        maxTicksLimit: 5,
+                        padding: 10,
+                        // Include a dollar sign in the ticks
+                        callback: function(value, index, values) {
+                            return number_format(value);
+                        }
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }]
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                titleMarginBottom: 10,
+                titleFontColor: "#6e707e",
+                titleFontSize: 14,
+                borderColor: "#dddfeb",
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                intersect: false,
+                mode: "index",
+                caretPadding: 10,
+                callbacks: {
+                    label: function(tooltipItem, chart) {
+                        var datasetLabel =
+                            chart.datasets[tooltipItem.datasetIndex].label || "";
+                        return datasetLabel + ": " + number_format(tooltipItem.yLabel);
+                    }
+                }
+            }
+        }
+    });
+</script>
 
 {% endblock %}

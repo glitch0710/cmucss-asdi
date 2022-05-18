@@ -182,7 +182,7 @@
                               <!-- Sidenav Heading (User Dashboard)-->
                               <div class="sidenav-menu-heading">User</div>
                               <!-- Sidenav Accordion (Dashboard)-->
-                              <a class="nav-link" href="#">
+                              <a class="nav-link" href="{% url 'office_admin' %}">
                                   <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
                                   User Dashboard
                               </a>
@@ -204,10 +204,17 @@
                           {% endif %}
 
                           <!-- Sidenav Accordion (User Accounts)-->
-                          <a class="nav-link" href="{% url 'my_account' %}">
-                              <div class="nav-link-icon"><i data-feather="settings"></i></div>
-                              My Account
-                          </a>
+                          {% if user_group == 1 %}
+                              <a class="nav-link" href="{% url 'my_account' %}">
+                                  <div class="nav-link-icon"><i data-feather="settings"></i></div>
+                                  My Account
+                              </a>
+                          {% else %}
+                              <a class="nav-link" href="{% url 'helpdesk_monitoring_account' %}">
+                                  <div class="nav-link-icon"><i data-feather="settings"></i></div>
+                                  My Account
+                              </a>
+                          {% endif %}
                       </div>
                   </div>
                     <!-- Sidenav Footer-->
@@ -259,5 +266,6 @@
         <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" crossorigin="anonymous"></script>
         <script src="{% static 'assets1/demo/date-range-picker-demo.js' %}"></script>
+        {% block chart_js %}{% endblock %}
     </body>
 </html>

@@ -1,5 +1,3 @@
-console.log('hello world');
-
 function copyToClipboard(element) {
     var $temp = $("<input>");
     $("body").append($temp);

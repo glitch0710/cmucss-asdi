@@ -147,3 +147,13 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'cmu.css@cmu.edu.ph'
 EMAIL_HOST_PASSWORD = 'vvuzfobwdtbklalw'
 EMAIL_USE_TLS = True
+
+
+# Session Handler
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 3600
+SESSION_SAVE_EVERY_REQUEST = True
+
+# Redirect not authenticated users
+LOGIN_REDIRECT_URL = 'cpanel'
+LOGIN_URL = 'login/'

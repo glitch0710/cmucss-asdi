@@ -2,7 +2,15 @@
 
 {% block title %} OCSS Control Panel {% endblock %}
 
-{% block page_title %} <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a> {% endblock %}
+{% block page_title %}
+    {% if user_group == 2 %}
+        <a class="navbar-brand" href="{% url 'controlpanel' %}">Help Desk Monitoring</a>
+    {% elif user_group == 3 %}
+        <a class="navbar-brand" href="{% url 'controlpanel' %}">Help Desk</a>
+    {% else %}
+        <a class="navbar-brand" href="{% url 'controlpanel' %}">Online CSS</a>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 {% load static %}
